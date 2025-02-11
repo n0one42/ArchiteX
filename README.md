@@ -67,5 +67,5 @@ pnpm run dev
 
 ```bash
 docker build -t architex_frontend:v1 .
-docker run -d -p 3142:3142 --name my_architex_frontend_v1 architex_frontend:v1
+docker run -d -p 3342:3342 --name my_architex_frontend_v1 architex_frontend:v1
 ```
