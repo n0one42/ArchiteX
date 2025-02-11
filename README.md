@@ -62,3 +62,10 @@ dotnet run --project Web/Web.csproj
 ```bash
 pnpm run dev
 ```
+
+### Docker
+
+```bash
+docker build -t architex_frontend:v1 .
+docker run -d -p 3142:3142 --name my_architex_frontend_v1 architex_frontend:v1
+```
