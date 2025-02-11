@@ -1,3 +1,15 @@
+## WIP
+
+Following some guidelines is always good but still hard to get one which works since there are just plenty of them. However, I like the expertise [Web Dev Simplified](https://www.youtube.com/@WebDevSimplified) has and I think, this structure would just works best. This is what I will follow.
+Red => starting point ; Blue => global (entire application) ; Green = individual features
+![image](https://github.com/user-attachments/assets/2a0a5a5d-9f9c-4b75-8d1e-01d816014e35)
+![image](https://github.com/user-attachments/assets/fabb1e8a-7dd8-41f2-b709-beb7c709c0d1)
+
+The complete video can be found [here](https://www.youtube.com/watch?v=xyxrB2Aa7KE) (recommended to watch!)
+
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
