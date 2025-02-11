@@ -1,0 +1,62 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.workingDirectories": [
+    {
+      "directory": "../frontend/src",
+      "changeProcessCWD": true
+    }
+  ],
+  "hidefiles.configurationType": "local",
+  "hidefiles.globalConfig": {
+    "profiles": [
+      {
+        "name": "Default",
+        "detail": "",
+        "description": "Test",
+        "hidden": [".vscode/"]
+      },
+      {
+        "name": "Strict",
+        "detail": "Hide everything not immediately required",
+        "hidden": ["$Default"]
+      },
+      {
+        "hidden": [
+          "backend/",
+          "scripts/",
+          ".gitignore",
+          ".cursorignore",
+          ".gitattributes",
+          "docker-compose.yml",
+          "LICENSE",
+          "instructions/"
+        ],
+        "name": "frontend",
+        "description": "",
+        "detail": "",
+        "peek": []
+      }
+    ]
+  },
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "backend/": true,
+    "scripts/": true,
+    ".gitignore": true,
+    ".cursorignore": true,
+    ".gitattributes": true,
+    "docker-compose.yml": true,
+    "LICENSE": true,
+    "instructions/": true
+  },
+  "hidefiles.selectedProfile": "frontend",
+  "cSpell.words": ["Archite"]
+}

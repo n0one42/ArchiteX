@@ -17,8 +17,8 @@ ArchiteX is a full-stack starter project that combines a C# CleanArchitecture ba
 - **CleanArchitecture Backend:**  
   Implements a robust, modular C# solution with clear separation between Domain, Application, Infrastructure, and Presentation layers.
   
-- **Next.js Frontend:**  
-  A modern, fast frontend built with Next.js and managed with pnpm.
+- **Next.js / Shadcn UI Frontend:**  
+  A modern, fast frontend built with Next.js/Shadcn UI and managed with pnpm.
   
 - **Built-in Authentication:**  
   Pre-configured authentication modules to secure your application right out of the box.
@@ -37,6 +37,11 @@ ArchiteX is a full-stack starter project that combines a C# CleanArchitecture ba
 ## Usage
 
 ### Requirements
+
+- dotnet 9.0.101
+- node <=20 (23 used in this template)
+- pnpm 10.3.0
+- fnm 1.38.1
 
 ```bash
 brew install fnm dotnet pnpm # or yarn
