@@ -1,4 +1,5 @@
 # ArchiteX
+
 ArchiteX is a full-stack starter project that combines a C# CleanArchitecture backend with a Next.js frontend (using pnpm) and optional mobile projects (Expo and Flutter). This template comes preconfigured with built-in authentication, database integration, and a modular project structure, enabling you to rapidly kickstart new projects with best practices already in place.
 
 ## Table of Contents
@@ -32,3 +33,32 @@ ArchiteX is a full-stack starter project that combines a C# CleanArchitecture ba
   Includes Docker Compose configurations for simplified local development and testing.
 
 ## Project Structure
+
+## Usage
+
+### Requirements
+
+```bash
+brew install fnm dotnet pnpm # or yarn
+fnm install 23
+fnm default 23 # or fnm use 23
+```
+
+### From within root directory
+
+```bash
+pnpm -C frontend run dev
+dotnet run --project backend/src/Web/Web.csproj
+```
+
+### From within backend directory
+
+```bash
+dotnet run --project Web/Web.csproj
+```
+
+### From within frontend directory
+
+```bash
+pnpm run dev
+```
