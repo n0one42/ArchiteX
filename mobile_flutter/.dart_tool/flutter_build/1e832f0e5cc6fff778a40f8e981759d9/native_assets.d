@@ -1,0 +1,1 @@
+ /Users/harold/Documents/GitHub/ArchiteX/mobile_flutter/.dart_tool/flutter_build/1e832f0e5cc6fff778a40f8e981759d9/native_assets.yaml: 

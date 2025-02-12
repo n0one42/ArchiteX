@@ -1,0 +1,1 @@
+@rpath/architex_flutter.debug.dylib
