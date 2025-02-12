@@ -7,7 +7,6 @@ Red => starting point ; Blue => global (entire application) ; Green = individual
 
 The complete video can be found [here](https://www.youtube.com/watch?v=xyxrB2Aa7KE) (recommended to watch!)
 
-
 ---
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
@@ -54,3 +53,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ```bash
 npx shadcn@latest init
 ```
+
+## Notes
+
+https://www.shadcn-form.com/playground
