@@ -59,5 +59,84 @@
       "referencePaths": [],
       "useNuGetCache": false
     }
+  },
+  "codeGenerators": {
+    "openApiToTypeScriptClient": {
+      "typeScriptVersion": 4.3,
+      "template": "Fetch",
+      "promiseType": "Promise",
+      "httpClass": "HttpClient",
+      "withCredentials": false,
+      "useSingletonProvider": false,
+      "injectionTokenType": "OpaqueToken",
+      "rxJsVersion": 6.0,
+      "dateTimeType": "String",
+      "nullValue": "Undefined",
+      "generateClientClasses": true,
+      "generateClientInterfaces": true,
+      "generateOptionalParameters": true,
+      "exportTypes": true,
+      "wrapDtoExceptions": false,
+      "exceptionClass": "ApiException",
+      "clientBaseClass": null,
+      "wrapResponses": false,
+      "wrapResponseMethods": [],
+      "generateResponseClasses": true,
+      "responseClass": "SwaggerResponse",
+      "protectedMethods": [],
+      "configurationClass": null,
+      "useTransformOptionsMethod": false,
+      "useTransformResultMethod": false,
+      "generateDtoTypes": true,
+      "operationGenerationMode": "MultipleClientsFromOperationId",
+      "markOptionalProperties": true,
+      "generateCloneMethod": false,
+      "typeStyle": "Interface",
+      "enumStyle": "Enum",
+      "useLeafType": false,
+      "classTypes": [],
+      "extendedClasses": [],
+      "extensionCode": null,
+      "generateDefaultValues": true,
+      "excludedTypeNames": [],
+      "excludedParameterNames": [],
+      "handleReferences": false,
+      "generateTypeCheckFunctions": false,
+      "generateConstructorInterface": true,
+      "convertConstructorInterfaceData": false,
+      "importRequiredTypes": true,
+      "useGetBaseUrlMethod": false,
+      "baseUrlTokenName": "API_BASE_URL",
+      "queryNullValue": "",
+      "useAbortSignal": true,
+      "inlineNamedDictionaries": false,
+      "inlineNamedAny": false,
+      "includeHttpContext": false,
+      "templateDirectory": null,
+      "serviceHost": null,
+      "serviceSchemes": null,
+      "output": "../../../frontend/src/api/client.ts",
+      "newLineBehavior": "Auto"
+    }
   }
 }
+///// <summary>Multiple clients from the Swagger operation ID in the form '{controller}_{action}'.</summary>
+//MultipleClientsFromOperationId,
+
+///// <summary>From path segments (operation name = last segment, client name = second to last segment).</summary>
+//MultipleClientsFromPathSegments,
+
+///// <summary>From the first operation tag and path segments (operation name = last segment, client name = first operation tag).</summary>
+//MultipleClientsFromFirstTagAndPathSegments,
+
+///// <summary>From the first operation tag and operation ID (operation name = operation ID, client name = first operation tag).</summary>
+//MultipleClientsFromFirstTagAndOperationId,
+
+///// <summary>From the Swagger operation ID.</summary>
+//SingleClientFromOperationId,
+
+///// <summary>From path segments suffixed by HTTP operation name</summary>
+//SingleClientFromPathSegments,
+
+///// <summary>From the first operation tag and operation name (underscore separated from operation id)</summary>
+//MultipleClientsFromFirstTagAndOperationName,
