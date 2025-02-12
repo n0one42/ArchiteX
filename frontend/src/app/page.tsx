@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 export default async function Home() {
-  const response = await fetch("http://mydom.com/api/Users/manage/info");
+  const response = await fetch(`${process.env.API_BASE_URL}/api/Users/manage/info`);
   const user = await response.json();
   console.log(user);
 

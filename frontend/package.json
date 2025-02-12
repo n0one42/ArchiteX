@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "postinstall": "npx next telemetry --disable",
     "frontend:dev": "pnpm -C frontend run dev",
     "frontend:dev-https": "pnpm -C frontend run dev-https",
     "dev": "next dev --turbopack --port 3142",
