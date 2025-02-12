@@ -10,6 +10,7 @@ const config = {
   printWidth: 120,
   singleQuote: false,
   trailingComma: "es5",
+  singleAttributePerLine: true,
 };
 
 export default config;

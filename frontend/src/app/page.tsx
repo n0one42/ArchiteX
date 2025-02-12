@@ -1,4 +1,15 @@
 import Image from "next/image";
+import { server } from "../mocks/node";
+
+if (process.env.USE_MOCKS) {
+  console.log("Using mocks");
+  console.log(process.env.USE_MOCKS);
+
+  server.listen();
+} else {
+  console.log("Using real data");
+  server.close();
+}
 
 export default function Home() {
   return (

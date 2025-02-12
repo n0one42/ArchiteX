@@ -8,7 +8,7 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-export interface IClient {
+export interface ITodoItemsClient {
 
     getTodoItemsWithPagination(listId: number, pageNumber: number, pageSize: number): Promise<PaginatedListOfTodoItemBriefDto>;
 
@@ -19,39 +19,9 @@ export interface IClient {
     deleteTodoItem(id: number): Promise<void>;
 
     updateTodoItemDetail(id: number, command: UpdateTodoItemDetailCommand): Promise<void>;
-
-    getTodoLists(): Promise<TodosVm>;
-
-    createTodoList(command: CreateTodoListCommand): Promise<number>;
-
-    updateTodoList(id: number, command: UpdateTodoListCommand): Promise<void>;
-
-    deleteTodoList(id: number): Promise<void>;
-
-    postApiUsersRegister(registration: RegisterRequest): Promise<void>;
-
-    postApiUsersLogin(login: LoginRequest, useCookies?: boolean | null | undefined, useSessionCookies?: boolean | null | undefined): Promise<AccessTokenResponse>;
-
-    postApiUsersRefresh(refreshRequest: RefreshRequest): Promise<AccessTokenResponse>;
-
-    getApiUsersConfirmEmail(userId: string | null, code: string | null, changedEmail?: string | null | undefined): Promise<void>;
-
-    postApiUsersResendConfirmationEmail(resendRequest: ResendConfirmationEmailRequest): Promise<void>;
-
-    postApiUsersForgotPassword(resetRequest: ForgotPasswordRequest): Promise<void>;
-
-    postApiUsersResetPassword(resetRequest: ResetPasswordRequest): Promise<void>;
-
-    postApiUsersManage2fa(tfaRequest: TwoFactorRequest): Promise<TwoFactorResponse>;
-
-    getApiUsersManageInfo(): Promise<InfoResponse>;
-
-    postApiUsersManageInfo(infoRequest: InfoRequest): Promise<InfoResponse>;
-
-    getWeatherForecasts(): Promise<WeatherForecast[]>;
 }
 
-export class Client implements IClient {
+export class TodoItemsClient implements ITodoItemsClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -262,6 +232,28 @@ export class Client implements IClient {
         }
         return Promise.resolve<void>(null as any);
     }
+}
+
+export interface ITodoListsClient {
+
+    getTodoLists(): Promise<TodosVm>;
+
+    createTodoList(command: CreateTodoListCommand): Promise<number>;
+
+    updateTodoList(id: number, command: UpdateTodoListCommand): Promise<void>;
+
+    deleteTodoList(id: number): Promise<void>;
+}
+
+export class TodoListsClient implements ITodoListsClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
 
     getTodoLists(signal?: AbortSignal): Promise<TodosVm> {
         let url_ = this.baseUrl + "/api/TodoLists";
@@ -409,6 +401,40 @@ export class Client implements IClient {
             });
         }
         return Promise.resolve<void>(null as any);
+    }
+}
+
+export interface IUsersClient {
+
+    postApiUsersRegister(registration: RegisterRequest): Promise<void>;
+
+    postApiUsersLogin(login: LoginRequest, useCookies?: boolean | null | undefined, useSessionCookies?: boolean | null | undefined): Promise<AccessTokenResponse>;
+
+    postApiUsersRefresh(refreshRequest: RefreshRequest): Promise<AccessTokenResponse>;
+
+    getApiUsersConfirmEmail(userId: string | null, code: string | null, changedEmail?: string | null | undefined): Promise<void>;
+
+    postApiUsersResendConfirmationEmail(resendRequest: ResendConfirmationEmailRequest): Promise<void>;
+
+    postApiUsersForgotPassword(resetRequest: ForgotPasswordRequest): Promise<void>;
+
+    postApiUsersResetPassword(resetRequest: ResetPasswordRequest): Promise<void>;
+
+    postApiUsersManage2fa(tfaRequest: TwoFactorRequest): Promise<TwoFactorResponse>;
+
+    getApiUsersManageInfo(): Promise<InfoResponse>;
+
+    postApiUsersManageInfo(infoRequest: InfoRequest): Promise<InfoResponse>;
+}
+
+export class UsersClient implements IUsersClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
     }
 
     postApiUsersRegister(registration: RegisterRequest, signal?: AbortSignal): Promise<void> {
@@ -828,6 +854,22 @@ export class Client implements IClient {
             });
         }
         return Promise.resolve<InfoResponse>(null as any);
+    }
+}
+
+export interface IWeatherForecastsClient {
+
+    getWeatherForecasts(): Promise<WeatherForecast[]>;
+}
+
+export class WeatherForecastsClient implements IWeatherForecastsClient {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
     }
 
     getWeatherForecasts(signal?: AbortSignal): Promise<WeatherForecast[]> {
