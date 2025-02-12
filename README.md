@@ -1,5 +1,7 @@
 # ArchiteX
 
+Currently W.I.P and should be soon trully rdy to be used. Working on the integration
+
 ArchiteX is a full-stack starter project that combines a C# CleanArchitecture backend with a Next.js frontend (using pnpm) and optional mobile projects (Expo and Flutter). This template comes preconfigured with built-in authentication, database integration, and a modular project structure, enabling you to rapidly kickstart new projects with best practices already in place.
 
 ## Table of Contents
