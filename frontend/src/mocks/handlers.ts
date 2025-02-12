@@ -1,6 +1,12 @@
-import { demoUserHandlers } from "./demoUsers";
+import { userHandlers } from "./users";
+import { todoItemHandlers } from "./todoItems";
+import { todoListHandlers } from "./todoLists";
+import { weatherForecastHandlers } from "./weatherForecasts";
 
 export const handlers = [
-  ...demoUserHandlers,
+  ...userHandlers,
+  ...todoItemHandlers,
+  ...todoListHandlers,
+  ...weatherForecastHandlers,
   // Add any other handlers here
 ];
