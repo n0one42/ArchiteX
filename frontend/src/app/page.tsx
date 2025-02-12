@@ -1,17 +1,10 @@
 import Image from "next/image";
-import { server } from "../mocks/node";
 
-if (process.env.USE_MOCKS) {
-  console.log("Using mocks");
-  console.log(process.env.USE_MOCKS);
+export default async function Home() {
+  const response = await fetch("http://mydom.com/api/Users/manage/info");
+  const user = await response.json();
+  console.log(user);
 
-  server.listen();
-} else {
-  console.log("Using real data");
-  server.close();
-}
-
-export default function Home() {
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">

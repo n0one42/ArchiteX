@@ -1,13 +1,50 @@
 import { http, HttpResponse } from "msw";
+import { LoginRequest, RegisterRequest } from "../api/client";
+import {
+  demoAccessTokenResponse,
+  demoInfoResponse,
+  demoTwoFactorResponse,
+  validateDemoLogin,
+  validateDemoRegistration,
+} from "./demoUsers";
 
 export const handlers = [
-  // Intercept "GET https://example.com/user" requests...
-  http.get("https://example.com/user", () => {
-    // ...and respond to them using this JSON response.
-    return HttpResponse.json({
-      id: "c7b3d8e0-5e0b-4b0f-8b3a-3b9f4b3d3b3d",
-      firstName: "John",
-      lastName: "Maverick",
+  // User Registration
+  http.post("/api/Users/register", async ({ request }) => {
+    const registration = (await request.json()) as RegisterRequest;
+    if (validateDemoRegistration(registration)) {
+      return new HttpResponse(null, { status: 200 });
+    }
+    return new HttpResponse(null, {
+      status: 400,
+      statusText: "Email already exists",
     });
+  }),
+
+  // User Login
+  http.post("/api/Users/login", async ({ request }) => {
+    const login = (await request.json()) as LoginRequest;
+    if (validateDemoLogin(login)) {
+      return HttpResponse.json(demoAccessTokenResponse);
+    }
+    return new HttpResponse(null, {
+      status: 400,
+      statusText: "Invalid credentials",
+    });
+  }),
+
+  // Get User Info
+  http.get("*/api/Users/manage/info", () => {
+    return HttpResponse.json(demoInfoResponse);
+  }),
+
+  // Two Factor Authentication
+  http.post("/api/Users/manage/2fa", () => {
+    return HttpResponse.json(demoTwoFactorResponse);
+  }),
+
+  // Token Refresh
+  http.post("/api/Users/refresh", () => {
+    return HttpResponse.json(demoAccessTokenResponse);
   }),
 ];
