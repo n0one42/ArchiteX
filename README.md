@@ -1,6 +1,6 @@
 # ArchiteX
 
-Currently W.I.P and should be soon trully rdy to be used. Working on the integration
+Currently a work in progress. Integration is underway and should be completed soon.
 
 ArchiteX is a full-stack starter project that combines a C# CleanArchitecture backend with a Next.js frontend (using pnpm) and optional mobile projects (Expo and Flutter). This template comes preconfigured with built-in authentication, database integration, and a modular project structure, enabling you to rapidly kickstart new projects with best practices already in place.
 
@@ -76,3 +76,7 @@ pnpm run dev
 docker build -t architex_frontend:v1 .
 docker run -d -p 3342:3342 --name my_architex_frontend_v1 architex_frontend:v1
 ```
+
+### Roadmap
+Current Work
+	•	Authentication Integration: Implementing authentication between Next.js frontend and C# backend.
