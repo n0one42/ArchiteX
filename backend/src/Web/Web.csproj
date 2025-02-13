@@ -29,6 +29,10 @@
     <PackageReference Include="FluentValidation.AspNetCore" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Templates\" />
+  </ItemGroup>
+
 
   <!-- Auto-generated Open API specification and Angular TypeScript clients -->
   <PropertyGroup>

@@ -2,6 +2,11 @@ using backend.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#if DEBUG
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+#endif
+
 // Add services to the container.
 builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
@@ -13,6 +18,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseExceptionHandler("/Error");
     await app.InitialiseDatabaseAsync();
 }
 else

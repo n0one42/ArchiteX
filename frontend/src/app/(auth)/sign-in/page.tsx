@@ -5,6 +5,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { UsersClient, LoginRequest, ApiException } from "@/api/client";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -22,6 +25,8 @@ const formSchema = z.object({
 });
 
 export default function LoginPreview() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,17 +36,45 @@ export default function LoginPreview() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     try {
-      // Assuming an async login function
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      // Create test login request
+      const loginRequest: LoginRequest = {
+        email: "test@test.de",
+        password: "Test#1234",
+        twoFactorCode: "string",
+        twoFactorRecoveryCode: "string",
+      };
+
+      // Create client instance
+      const client = new UsersClient("http://172.17.10.131:5141");
+
+      // Call login endpoint
+      const response = await client.postApiUsersLogin(loginRequest);
+
+      // Store tokens
+      if (response.accessToken) {
+        localStorage.setItem("accessToken", response.accessToken);
+        if (response.refreshToken) {
+          localStorage.setItem("refreshToken", response.refreshToken);
+        }
+      }
+
+      // Display success message
+      toast.success("Login successful!");
+      console.log("Login response:", response);
+
+      // Redirect to dashboard
+      router.push("/dashboard");
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      console.error("Login error:", error);
+      if (error instanceof ApiException) {
+        toast.error(error.message || "Invalid credentials");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -107,12 +140,14 @@ export default function LoginPreview() {
                 <Button
                   type="submit"
                   className="w-full"
+                  disabled={isLoading}
                 >
-                  Login
+                  {isLoading ? "Logging in..." : "Login"}
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full"
+                  disabled={isLoading}
                 >
                   Login with Google
                 </Button>
@@ -122,7 +157,7 @@ export default function LoginPreview() {
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link
-              href="#"
+              href="/sign-up"
               className="underline"
             >
               Sign up

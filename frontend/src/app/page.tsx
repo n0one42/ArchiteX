@@ -1,8 +1,13 @@
 import Image from "next/image";
+import { WeatherForecastsClient } from "@/api/client";
 
 export default async function Home() {
-  const response = await fetch(`${process.env.API_BASE_URL}/api/WeatherForecasts`);
-  const result = await response.json();
+  // const response = await fetch(`${process.env.API_BASE_URL}/api/WeatherForecasts`);
+  // const result = await response.json();
+  // console.log(result);
+
+  const client = new WeatherForecastsClient(process.env.API_BASE_URL);
+  const result = await client.getWeatherForecasts();
   console.log(result);
 
   // const response = await fetch(`${process.env.API_BASE_URL}/api/Users/manage/info`);
