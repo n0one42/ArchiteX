@@ -1,4 +1,6 @@
 import { ThemeProvider } from "@/components/theme-provider";
+import { ModeToggle } from "@/components/mode-toggle";
+import { ThemedToaster } from "@/components/themed-toaster";
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -37,7 +39,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <div className="fixed top-4 right-4 z-50">
+            <ModeToggle />
+          </div>
           {children}
+          <ThemedToaster />
         </ThemeProvider>
       </body>
     </html>
