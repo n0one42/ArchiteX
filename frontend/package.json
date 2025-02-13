@@ -6,7 +6,7 @@
     "postinstall": "npx next telemetry --disable",
     "frontend:dev": "pnpm -C frontend run dev",
     "frontend:dev-https": "pnpm -C frontend run dev-https",
-    "dev": "next dev --turbopack --port 3142",
+    "dev": "next dev --port 3142",
     "dev-https": "next dev --turbopack --experimental-https --port 3142",
     "build": "next build",
     "start": "next start",

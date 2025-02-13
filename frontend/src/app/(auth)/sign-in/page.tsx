@@ -6,14 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { UsersClient, LoginRequest, ApiException } from "@/api/client";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { UsersClient } from "@/api/client";
+import { LoginRequest } from "@/api/client";
 
 // Improved schema with additional validation rules
 const formSchema = z.object({
@@ -26,55 +26,41 @@ const formSchema = z.object({
 
 export default function LoginPreview() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: "test@test.de",
+      password: "Test#12345",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
     try {
-      // Create test login request
-      const loginRequest: LoginRequest = {
-        email: "test@test.de",
-        password: "Test#1234",
-        twoFactorCode: "string",
-        twoFactorRecoveryCode: "string",
-      };
+      const client = new UsersClient(process.env.NEXT_PUBLIC_API_BASE_URL);
+      const loginRequest = new LoginRequest({
+        email: values.email,
+        password: values.password,
+        twoFactorCode: "string", // Default value since not needed yet
+        twoFactorRecoveryCode: "string", // Default value since not needed yet
+      });
 
-      // Create client instance
-      const client = new UsersClient("http://172.17.10.131:5141");
-
-      // Call login endpoint
       const response = await client.postApiUsersLogin(loginRequest);
 
-      // Store tokens
       if (response.accessToken) {
+        // Store the tokens securely
         localStorage.setItem("accessToken", response.accessToken);
         if (response.refreshToken) {
           localStorage.setItem("refreshToken", response.refreshToken);
         }
+
+        toast.success("Successfully logged in!");
+        router.push("/"); // Redirect to home page
       }
-
-      // Display success message
-      toast.success("Login successful!");
-      console.log("Login response:", response);
-
-      // Redirect to dashboard
-      router.push("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      if (error instanceof ApiException) {
-        toast.error(error.message || "Invalid credentials");
-      } else {
-        toast.error("An unexpected error occurred");
-      }
-    } finally {
-      setIsLoading(false);
+      const errorMessage =
+        error.response?.data?.title || error.message || "Failed to login. Please check your credentials.";
+      toast.error(errorMessage);
     }
   }
 
@@ -140,14 +126,12 @@ export default function LoginPreview() {
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isLoading}
                 >
-                  {isLoading ? "Logging in..." : "Login"}
+                  Login
                 </Button>
                 <Button
                   variant="outline"
                   className="w-full"
-                  disabled={isLoading}
                 >
                   Login with Google
                 </Button>
@@ -157,7 +141,7 @@ export default function LoginPreview() {
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link
-              href="/sign-up"
+              href="#"
               className="underline"
             >
               Sign up
