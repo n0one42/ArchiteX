@@ -5,19 +5,20 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { UsersClient } from "@/api/client";
 
 // Define validation schema using Zod
 const formSchema = z
   .object({
     name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
     email: z.string().email({ message: "Invalid email address" }),
-    phone: z.string().min(10, { message: "Phone number must be valid" }),
     password: z
       .string()
       .min(6, { message: "Password must be at least 6 characters long" })
@@ -30,6 +31,7 @@ const formSchema = z
   });
 
 export default function RegisterPreview() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,16 +44,26 @@ export default function RegisterPreview() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // Assuming an async registration function
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
+        throw new Error("API base URL is not configured");
+      }
+
+      const client = new UsersClient(process.env.NEXT_PUBLIC_API_BASE_URL);
+      const registerRequest = {
+        email: values.email,
+        password: values.password,
+      };
+      await client.postApiUsersRegister(registerRequest);
+
+      toast.success("Registration successful! Please check your email to verify your account.");
+      router.push("/sign-in");
+    } catch (error: any) {
+      console.error("Full error object:", error);
+
+      const errorMessage =
+        error.result?.detail || error.result?.title || error.message || "Failed to register. Please try again.";
+      console.warn("Registration error:", errorMessage);
+      toast.error(errorMessage);
     }
   }
 
@@ -158,6 +170,7 @@ export default function RegisterPreview() {
                 <Button
                   variant="outline"
                   className="w-full"
+                  type="button"
                 >
                   Register with Google
                 </Button>
