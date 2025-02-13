@@ -13,7 +13,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { UsersClient } from "@/api/client";
-import { ModeToggle } from "@/components/mode-toggle";
 
 // Improved schema with additional validation rules
 const formSchema = z.object({
@@ -65,10 +64,7 @@ export default function LoginPreview() {
   }
 
   return (
-    <div className="flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4">
-      <div className="fixed top-4 right-4">
-        <ModeToggle />
-      </div>
+    <div className="flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4 pt-16">
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
@@ -144,7 +140,7 @@ export default function LoginPreview() {
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link
-              href="#"
+              href="/sign-up"
               className="underline"
             >
               Sign up
