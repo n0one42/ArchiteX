@@ -38,12 +38,64 @@ export const demoTwoFactorResponse: TwoFactorResponse = {
   isMachineRemembered: false,
 };
 
+// Error response type matching the API
+interface ErrorResponse {
+  type: string;
+  title: string;
+  status: number;
+  detail: string;
+}
+
+// Standard error responses
+const unauthorizedError: ErrorResponse = {
+  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
+  title: "Unauthorized",
+  status: 401,
+  detail: "Failed",
+};
+
+const invalidCredentialsError: ErrorResponse = {
+  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
+  title: "Invalid Credentials",
+  status: 401,
+  detail: "The provided credentials are incorrect",
+};
+
+const emailNotConfirmedError: ErrorResponse = {
+  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
+  title: "Email Not Confirmed",
+  status: 401,
+  detail: "Please confirm your email before logging in",
+};
+
 // Helper functions for mock handlers
 export const finduser = (email: string) => users.find((user) => user.email === email);
 
-export const validateDemoLogin = (login: LoginRequest) => {
+export const validateDemoLogin = (login: LoginRequest): { isValid: boolean; error?: ErrorResponse } => {
   const user = finduser(login.email!);
-  return user && user.password === login.password;
+
+  if (!user) {
+    return {
+      isValid: false,
+      error: invalidCredentialsError,
+    };
+  }
+
+  if (!user.isEmailConfirmed) {
+    return {
+      isValid: false,
+      error: emailNotConfirmedError,
+    };
+  }
+
+  if (user.password !== login.password) {
+    return {
+      isValid: false,
+      error: invalidCredentialsError,
+    };
+  }
+
+  return { isValid: true };
 };
 
 export const validateDemoRegistration = (registration: RegisterRequest) => {
@@ -58,21 +110,28 @@ export const userHandlers = [
     if (validateDemoRegistration(registration)) {
       return new HttpResponse(null, { status: 200 });
     }
-    return new HttpResponse(null, {
-      status: 400,
-      statusText: "Email already exists",
-    });
+    return HttpResponse.json(
+      {
+        type: "https://tools.ietf.org/html/rfc9110#section-15.5.4",
+        title: "Email Already Exists",
+        status: 400,
+        detail: "An account with this email already exists",
+      },
+      { status: 400 }
+    );
   }),
 
   // User Login
   http.post("*/api/Users/login", async ({ request }) => {
     const login = (await request.json()) as LoginRequest;
-    if (validateDemoLogin(login)) {
+    const validationResult = validateDemoLogin(login);
+
+    if (validationResult.isValid) {
       return HttpResponse.json(demoAccessTokenResponse);
     }
-    return new HttpResponse(null, {
-      status: 400,
-      statusText: "Invalid credentials",
+
+    return HttpResponse.json(validationResult.error || unauthorizedError, {
+      status: validationResult.error?.status || 401,
     });
   }),
 

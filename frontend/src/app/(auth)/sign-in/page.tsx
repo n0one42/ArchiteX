@@ -13,15 +13,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { UsersClient } from "@/api/client";
-import { LoginRequest } from "@/api/client";
+import { ModeToggle } from "@/components/mode-toggle";
 
 // Improved schema with additional validation rules
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters long" })
-    .regex(/[a-zA-Z0-9]/, { message: "Password must be alphanumeric" }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters long" }),
 });
 
 export default function LoginPreview() {
@@ -29,20 +26,20 @@ export default function LoginPreview() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "test@test.de",
-      password: "Test#12345",
+      email: "",
+      password: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       const client = new UsersClient(process.env.NEXT_PUBLIC_API_BASE_URL);
-      const loginRequest = new LoginRequest({
+      const loginRequest = {
         email: values.email,
         password: values.password,
         twoFactorCode: "string", // Default value since not needed yet
         twoFactorRecoveryCode: "string", // Default value since not needed yet
-      });
+      };
 
       const response = await client.postApiUsersLogin(loginRequest);
 
@@ -57,15 +54,21 @@ export default function LoginPreview() {
         router.push("/"); // Redirect to home page
       }
     } catch (error: any) {
-      console.error("Login error:", error);
       const errorMessage =
-        error.response?.data?.title || error.message || "Failed to login. Please check your credentials.";
+        error.result?.detail ||
+        error.result?.title ||
+        error.message ||
+        "Failed to login. Please check your credentials.";
+      console.warn("Login error:", error.result || error);
       toast.error(errorMessage);
     }
   }
 
   return (
     <div className="flex flex-col min-h-[50vh] h-full w-full items-center justify-center px-4">
+      <div className="fixed top-4 right-4">
+        <ModeToggle />
+      </div>
       <Card className="mx-auto max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>

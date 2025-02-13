@@ -8,28 +8,27 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-import axios, { AxiosError } from 'axios';
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
-
 export interface ITodoItemsClient {
+
     getTodoItemsWithPagination(listId: number, pageNumber: number, pageSize: number): Promise<PaginatedListOfTodoItemBriefDto>;
+
     createTodoItem(command: CreateTodoItemCommand): Promise<number>;
+
     updateTodoItem(id: number, command: UpdateTodoItemCommand): Promise<void>;
+
     deleteTodoItem(id: number): Promise<void>;
+
     updateTodoItemDetail(id: number, command: UpdateTodoItemDetailCommand): Promise<void>;
 }
 
 export class TodoItemsClient implements ITodoItemsClient {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
         this.baseUrl = baseUrl ?? "";
-
     }
 
     getTodoItemsWithPagination(listId: number, pageNumber: number, pageSize: number, signal?: AbortSignal): Promise<PaginatedListOfTodoItemBriefDto> {
@@ -48,46 +47,32 @@ export class TodoItemsClient implements ITodoItemsClient {
             url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
+        let options_: RequestInit = {
             method: "GET",
-            url: url_,
+            signal,
             headers: {
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetTodoItemsWithPagination(_response);
         });
     }
 
-    protected processGetTodoItemsWithPagination(response: AxiosResponse): Promise<PaginatedListOfTodoItemBriefDto> {
+    protected processGetTodoItemsWithPagination(response: Response): Promise<PaginatedListOfTodoItemBriefDto> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = PaginatedListOfTodoItemBriefDto.fromJS(resultData200);
-            return Promise.resolve<PaginatedListOfTodoItemBriefDto>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as PaginatedListOfTodoItemBriefDto;
+            return result200;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<PaginatedListOfTodoItemBriefDto>(null as any);
     }
@@ -98,49 +83,34 @@ export class TodoItemsClient implements ITodoItemsClient {
 
         const content_ = JSON.stringify(command);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processCreateTodoItem(_response);
         });
     }
 
-    protected processCreateTodoItem(response: AxiosResponse): Promise<number> {
+    protected processCreateTodoItem(response: Response): Promise<number> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 201) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result201: any = null;
-            let resultData201  = _responseText;
-                result201 = resultData201 !== undefined ? resultData201 : <any>null;
-    
-            return Promise.resolve<number>(result201);
-
+            result201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number;
+            return result201;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<number>(null as any);
     }
@@ -154,48 +124,35 @@ export class TodoItemsClient implements ITodoItemsClient {
 
         const content_ = JSON.stringify(command);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "PUT",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processUpdateTodoItem(_response);
         });
     }
 
-    protected processUpdateTodoItem(response: AxiosResponse): Promise<void> {
+    protected processUpdateTodoItem(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("A server side error occurred.", status, _responseText, _headers);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -207,42 +164,29 @@ export class TodoItemsClient implements ITodoItemsClient {
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
+        let options_: RequestInit = {
             method: "DELETE",
-            url: url_,
+            signal,
             headers: {
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processDeleteTodoItem(_response);
         });
     }
 
-    protected processDeleteTodoItem(response: AxiosResponse): Promise<void> {
+    protected processDeleteTodoItem(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -256,117 +200,91 @@ export class TodoItemsClient implements ITodoItemsClient {
 
         const content_ = JSON.stringify(command);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "PUT",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processUpdateTodoItemDetail(_response);
         });
     }
 
-    protected processUpdateTodoItemDetail(response: AxiosResponse): Promise<void> {
+    protected processUpdateTodoItemDetail(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("A server side error occurred.", status, _responseText, _headers);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
 }
 
 export interface ITodoListsClient {
+
     getTodoLists(): Promise<TodosVm>;
+
     createTodoList(command: CreateTodoListCommand): Promise<number>;
+
     updateTodoList(id: number, command: UpdateTodoListCommand): Promise<void>;
+
     deleteTodoList(id: number): Promise<void>;
 }
 
 export class TodoListsClient implements ITodoListsClient {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
         this.baseUrl = baseUrl ?? "";
-
     }
 
     getTodoLists(signal?: AbortSignal): Promise<TodosVm> {
         let url_ = this.baseUrl + "/api/TodoLists";
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
+        let options_: RequestInit = {
             method: "GET",
-            url: url_,
+            signal,
             headers: {
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetTodoLists(_response);
         });
     }
 
-    protected processGetTodoLists(response: AxiosResponse): Promise<TodosVm> {
+    protected processGetTodoLists(response: Response): Promise<TodosVm> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = TodosVm.fromJS(resultData200);
-            return Promise.resolve<TodosVm>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TodosVm;
+            return result200;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<TodosVm>(null as any);
     }
@@ -377,49 +295,34 @@ export class TodoListsClient implements ITodoListsClient {
 
         const content_ = JSON.stringify(command);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processCreateTodoList(_response);
         });
     }
 
-    protected processCreateTodoList(response: AxiosResponse): Promise<number> {
+    protected processCreateTodoList(response: Response): Promise<number> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 201) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result201: any = null;
-            let resultData201  = _responseText;
-                result201 = resultData201 !== undefined ? resultData201 : <any>null;
-    
-            return Promise.resolve<number>(result201);
-
+            result201 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as number;
+            return result201;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<number>(null as any);
     }
@@ -433,48 +336,35 @@ export class TodoListsClient implements ITodoListsClient {
 
         const content_ = JSON.stringify(command);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "PUT",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processUpdateTodoList(_response);
         });
     }
 
-    protected processUpdateTodoList(response: AxiosResponse): Promise<void> {
+    protected processUpdateTodoList(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("A server side error occurred.", status, _responseText, _headers);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -486,71 +376,65 @@ export class TodoListsClient implements ITodoListsClient {
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
+        let options_: RequestInit = {
             method: "DELETE",
-            url: url_,
+            signal,
             headers: {
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processDeleteTodoList(_response);
         });
     }
 
-    protected processDeleteTodoList(response: AxiosResponse): Promise<void> {
+    protected processDeleteTodoList(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 204) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
 }
 
 export interface IUsersClient {
+
     postApiUsersRegister(registration: RegisterRequest): Promise<void>;
+
     postApiUsersLogin(login: LoginRequest, useCookies?: boolean | null | undefined, useSessionCookies?: boolean | null | undefined): Promise<AccessTokenResponse>;
+
     postApiUsersRefresh(refreshRequest: RefreshRequest): Promise<AccessTokenResponse>;
+
     getApiUsersConfirmEmail(userId: string | null, code: string | null, changedEmail?: string | null | undefined): Promise<void>;
+
     postApiUsersResendConfirmationEmail(resendRequest: ResendConfirmationEmailRequest): Promise<void>;
+
     postApiUsersForgotPassword(resetRequest: ForgotPasswordRequest): Promise<void>;
+
     postApiUsersResetPassword(resetRequest: ResetPasswordRequest): Promise<void>;
+
     postApiUsersManage2fa(tfaRequest: TwoFactorRequest): Promise<TwoFactorResponse>;
+
     getApiUsersManageInfo(): Promise<InfoResponse>;
+
     postApiUsersManageInfo(infoRequest: InfoRequest): Promise<InfoResponse>;
 }
 
 export class UsersClient implements IUsersClient {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
         this.baseUrl = baseUrl ?? "";
-
     }
 
     postApiUsersRegister(registration: RegisterRequest, signal?: AbortSignal): Promise<void> {
@@ -559,51 +443,37 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(registration);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersRegister(_response);
         });
     }
 
-    protected processPostApiUsersRegister(response: AxiosResponse): Promise<void> {
+    protected processPostApiUsersRegister(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = HttpValidationProblemDetails.fromJS(resultData400);
+            result400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as HttpValidationProblemDetails;
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -618,48 +488,34 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(login);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersLogin(_response);
         });
     }
 
-    protected processPostApiUsersLogin(response: AxiosResponse): Promise<AccessTokenResponse> {
+    protected processPostApiUsersLogin(response: Response): Promise<AccessTokenResponse> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = AccessTokenResponse.fromJS(resultData200);
-            return Promise.resolve<AccessTokenResponse>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AccessTokenResponse;
+            return result200;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<AccessTokenResponse>(null as any);
     }
@@ -670,48 +526,34 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(refreshRequest);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersRefresh(_response);
         });
     }
 
-    protected processPostApiUsersRefresh(response: AxiosResponse): Promise<AccessTokenResponse> {
+    protected processPostApiUsersRefresh(response: Response): Promise<AccessTokenResponse> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = AccessTokenResponse.fromJS(resultData200);
-            return Promise.resolve<AccessTokenResponse>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as AccessTokenResponse;
+            return result200;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<AccessTokenResponse>(null as any);
     }
@@ -730,42 +572,29 @@ export class UsersClient implements IUsersClient {
             url_ += "changedEmail=" + encodeURIComponent("" + changedEmail) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
+        let options_: RequestInit = {
             method: "GET",
-            url: url_,
+            signal,
             headers: {
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetApiUsersConfirmEmail(_response);
         });
     }
 
-    protected processGetApiUsersConfirmEmail(response: AxiosResponse): Promise<void> {
+    protected processGetApiUsersConfirmEmail(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -776,44 +605,31 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(resendRequest);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersResendConfirmationEmail(_response);
         });
     }
 
-    protected processPostApiUsersResendConfirmationEmail(response: AxiosResponse): Promise<void> {
+    protected processPostApiUsersResendConfirmationEmail(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -824,51 +640,37 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(resetRequest);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersForgotPassword(_response);
         });
     }
 
-    protected processPostApiUsersForgotPassword(response: AxiosResponse): Promise<void> {
+    protected processPostApiUsersForgotPassword(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = HttpValidationProblemDetails.fromJS(resultData400);
+            result400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as HttpValidationProblemDetails;
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -879,51 +681,37 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(resetRequest);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersResetPassword(_response);
         });
     }
 
-    protected processPostApiUsersResetPassword(response: AxiosResponse): Promise<void> {
+    protected processPostApiUsersResetPassword(response: Response): Promise<void> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<void>(null as any);
-
+            return response.text().then((_responseText) => {
+            return;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = HttpValidationProblemDetails.fromJS(resultData400);
+            result400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as HttpValidationProblemDetails;
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<void>(null as any);
     }
@@ -934,59 +722,44 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(tfaRequest);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersManage2fa(_response);
         });
     }
 
-    protected processPostApiUsersManage2fa(response: AxiosResponse): Promise<TwoFactorResponse> {
+    protected processPostApiUsersManage2fa(response: Response): Promise<TwoFactorResponse> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = TwoFactorResponse.fromJS(resultData200);
-            return Promise.resolve<TwoFactorResponse>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as TwoFactorResponse;
+            return result200;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = HttpValidationProblemDetails.fromJS(resultData400);
+            result400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as HttpValidationProblemDetails;
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
+            });
         } else if (status === 404) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("A server side error occurred.", status, _responseText, _headers);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<TwoFactorResponse>(null as any);
     }
@@ -995,57 +768,42 @@ export class UsersClient implements IUsersClient {
         let url_ = this.baseUrl + "/api/Users/manage/info";
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
+        let options_: RequestInit = {
             method: "GET",
-            url: url_,
+            signal,
             headers: {
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetApiUsersManageInfo(_response);
         });
     }
 
-    protected processGetApiUsersManageInfo(response: AxiosResponse): Promise<InfoResponse> {
+    protected processGetApiUsersManageInfo(response: Response): Promise<InfoResponse> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = InfoResponse.fromJS(resultData200);
-            return Promise.resolve<InfoResponse>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as InfoResponse;
+            return result200;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = HttpValidationProblemDetails.fromJS(resultData400);
+            result400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as HttpValidationProblemDetails;
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
+            });
         } else if (status === 404) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("A server side error occurred.", status, _responseText, _headers);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<InfoResponse>(null as any);
     }
@@ -1056,193 +814,100 @@ export class UsersClient implements IUsersClient {
 
         const content_ = JSON.stringify(infoRequest);
 
-        let options_: AxiosRequestConfig = {
-            data: content_,
+        let options_: RequestInit = {
+            body: content_,
             method: "POST",
-            url: url_,
+            signal,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processPostApiUsersManageInfo(_response);
         });
     }
 
-    protected processPostApiUsersManageInfo(response: AxiosResponse): Promise<InfoResponse> {
+    protected processPostApiUsersManageInfo(response: Response): Promise<InfoResponse> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = InfoResponse.fromJS(resultData200);
-            return Promise.resolve<InfoResponse>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as InfoResponse;
+            return result200;
+            });
         } else if (status === 400) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result400: any = null;
-            let resultData400  = _responseText;
-            result400 = HttpValidationProblemDetails.fromJS(resultData400);
+            result400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as HttpValidationProblemDetails;
             return throwException("A server side error occurred.", status, _responseText, _headers, result400);
-
+            });
         } else if (status === 404) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("A server side error occurred.", status, _responseText, _headers);
-
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<InfoResponse>(null as any);
     }
 }
 
 export interface IWeatherForecastsClient {
+
     getWeatherForecasts(): Promise<WeatherForecast[]>;
 }
 
 export class WeatherForecastsClient implements IWeatherForecastsClient {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
         this.baseUrl = baseUrl ?? "";
-
     }
 
     getWeatherForecasts(signal?: AbortSignal): Promise<WeatherForecast[]> {
         let url_ = this.baseUrl + "/api/WeatherForecasts";
         url_ = url_.replace(/[?&]$/, "");
 
-        let options_: AxiosRequestConfig = {
+        let options_: RequestInit = {
             method: "GET",
-            url: url_,
+            signal,
             headers: {
                 "Accept": "application/json"
-            },
-            signal
+            }
         };
 
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
+        return this.http.fetch(url_, options_).then((_response: Response) => {
             return this.processGetWeatherForecasts(_response);
         });
     }
 
-    protected processGetWeatherForecasts(response: AxiosResponse): Promise<WeatherForecast[]> {
+    protected processGetWeatherForecasts(response: Response): Promise<WeatherForecast[]> {
         const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             let result200: any = null;
-            let resultData200  = _responseText;
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200!.push(WeatherForecast.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
-            return Promise.resolve<WeatherForecast[]>(result200);
-
+            result200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver) as WeatherForecast[];
+            return result200;
+            });
         } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
+            return response.text().then((_responseText) => {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
         }
         return Promise.resolve<WeatherForecast[]>(null as any);
     }
 }
 
-export class PaginatedListOfTodoItemBriefDto implements IPaginatedListOfTodoItemBriefDto {
-    items?: TodoItemBriefDto[];
-    pageNumber?: number;
-    totalPages?: number;
-    totalCount?: number;
-    hasPreviousPage?: boolean;
-    hasNextPage?: boolean;
-
-    constructor(data?: IPaginatedListOfTodoItemBriefDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(TodoItemBriefDto.fromJS(item));
-            }
-            this.pageNumber = _data["pageNumber"];
-            this.totalPages = _data["totalPages"];
-            this.totalCount = _data["totalCount"];
-            this.hasPreviousPage = _data["hasPreviousPage"];
-            this.hasNextPage = _data["hasNextPage"];
-        }
-    }
-
-    static fromJS(data: any): PaginatedListOfTodoItemBriefDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new PaginatedListOfTodoItemBriefDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["pageNumber"] = this.pageNumber;
-        data["totalPages"] = this.totalPages;
-        data["totalCount"] = this.totalCount;
-        data["hasPreviousPage"] = this.hasPreviousPage;
-        data["hasNextPage"] = this.hasNextPage;
-        return data;
-    }
-}
-
-export interface IPaginatedListOfTodoItemBriefDto {
+export interface PaginatedListOfTodoItemBriefDto {
     items?: TodoItemBriefDto[];
     pageNumber?: number;
     totalPages?: number;
@@ -1251,180 +916,25 @@ export interface IPaginatedListOfTodoItemBriefDto {
     hasNextPage?: boolean;
 }
 
-export class TodoItemBriefDto implements ITodoItemBriefDto {
-    id?: number;
-    listId?: number;
-    title?: string | undefined;
-    done?: boolean;
-
-    constructor(data?: ITodoItemBriefDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.listId = _data["listId"];
-            this.title = _data["title"];
-            this.done = _data["done"];
-        }
-    }
-
-    static fromJS(data: any): TodoItemBriefDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new TodoItemBriefDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["listId"] = this.listId;
-        data["title"] = this.title;
-        data["done"] = this.done;
-        return data;
-    }
-}
-
-export interface ITodoItemBriefDto {
+export interface TodoItemBriefDto {
     id?: number;
     listId?: number;
     title?: string | undefined;
     done?: boolean;
 }
 
-export class CreateTodoItemCommand implements ICreateTodoItemCommand {
-    listId?: number;
-    title?: string | undefined;
-
-    constructor(data?: ICreateTodoItemCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.listId = _data["listId"];
-            this.title = _data["title"];
-        }
-    }
-
-    static fromJS(data: any): CreateTodoItemCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateTodoItemCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["listId"] = this.listId;
-        data["title"] = this.title;
-        return data;
-    }
-}
-
-export interface ICreateTodoItemCommand {
+export interface CreateTodoItemCommand {
     listId?: number;
     title?: string | undefined;
 }
 
-export class UpdateTodoItemCommand implements IUpdateTodoItemCommand {
-    id?: number;
-    title?: string | undefined;
-    done?: boolean;
-
-    constructor(data?: IUpdateTodoItemCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.title = _data["title"];
-            this.done = _data["done"];
-        }
-    }
-
-    static fromJS(data: any): UpdateTodoItemCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateTodoItemCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["title"] = this.title;
-        data["done"] = this.done;
-        return data;
-    }
-}
-
-export interface IUpdateTodoItemCommand {
+export interface UpdateTodoItemCommand {
     id?: number;
     title?: string | undefined;
     done?: boolean;
 }
 
-export class UpdateTodoItemDetailCommand implements IUpdateTodoItemDetailCommand {
-    id?: number;
-    listId?: number;
-    priority?: PriorityLevel;
-    note?: string | undefined;
-
-    constructor(data?: IUpdateTodoItemDetailCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.listId = _data["listId"];
-            this.priority = _data["priority"];
-            this.note = _data["note"];
-        }
-    }
-
-    static fromJS(data: any): UpdateTodoItemDetailCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateTodoItemDetailCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["listId"] = this.listId;
-        data["priority"] = this.priority;
-        data["note"] = this.note;
-        return data;
-    }
-}
-
-export interface IUpdateTodoItemDetailCommand {
+export interface UpdateTodoItemDetailCommand {
     id?: number;
     listId?: number;
     priority?: PriorityLevel;
@@ -1438,206 +948,24 @@ export enum PriorityLevel {
     High = 3,
 }
 
-export class TodosVm implements ITodosVm {
-    priorityLevels?: LookupDto[];
-    lists?: TodoListDto[];
-
-    constructor(data?: ITodosVm) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["priorityLevels"])) {
-                this.priorityLevels = [] as any;
-                for (let item of _data["priorityLevels"])
-                    this.priorityLevels!.push(LookupDto.fromJS(item));
-            }
-            if (Array.isArray(_data["lists"])) {
-                this.lists = [] as any;
-                for (let item of _data["lists"])
-                    this.lists!.push(TodoListDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): TodosVm {
-        data = typeof data === 'object' ? data : {};
-        let result = new TodosVm();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.priorityLevels)) {
-            data["priorityLevels"] = [];
-            for (let item of this.priorityLevels)
-                data["priorityLevels"].push(item.toJSON());
-        }
-        if (Array.isArray(this.lists)) {
-            data["lists"] = [];
-            for (let item of this.lists)
-                data["lists"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface ITodosVm {
+export interface TodosVm {
     priorityLevels?: LookupDto[];
     lists?: TodoListDto[];
 }
 
-export class LookupDto implements ILookupDto {
-    id?: number;
-    title?: string | undefined;
-
-    constructor(data?: ILookupDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.title = _data["title"];
-        }
-    }
-
-    static fromJS(data: any): LookupDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new LookupDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["title"] = this.title;
-        return data;
-    }
-}
-
-export interface ILookupDto {
+export interface LookupDto {
     id?: number;
     title?: string | undefined;
 }
 
-export class TodoListDto implements ITodoListDto {
-    id?: number;
-    title?: string | undefined;
-    colour?: string | undefined;
-    items?: TodoItemDto[];
-
-    constructor(data?: ITodoListDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.title = _data["title"];
-            this.colour = _data["colour"];
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(TodoItemDto.fromJS(item));
-            }
-        }
-    }
-
-    static fromJS(data: any): TodoListDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new TodoListDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["title"] = this.title;
-        data["colour"] = this.colour;
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        return data;
-    }
-}
-
-export interface ITodoListDto {
+export interface TodoListDto {
     id?: number;
     title?: string | undefined;
     colour?: string | undefined;
     items?: TodoItemDto[];
 }
 
-export class TodoItemDto implements ITodoItemDto {
-    id?: number;
-    listId?: number;
-    title?: string | undefined;
-    done?: boolean;
-    priority?: number;
-    note?: string | undefined;
-
-    constructor(data?: ITodoItemDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.listId = _data["listId"];
-            this.title = _data["title"];
-            this.done = _data["done"];
-            this.priority = _data["priority"];
-            this.note = _data["note"];
-        }
-    }
-
-    static fromJS(data: any): TodoItemDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new TodoItemDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["listId"] = this.listId;
-        data["title"] = this.title;
-        data["done"] = this.done;
-        data["priority"] = this.priority;
-        data["note"] = this.note;
-        return data;
-    }
-}
-
-export interface ITodoItemDto {
+export interface TodoItemDto {
     id?: number;
     listId?: number;
     title?: string | undefined;
@@ -1646,137 +974,16 @@ export interface ITodoItemDto {
     note?: string | undefined;
 }
 
-export class CreateTodoListCommand implements ICreateTodoListCommand {
-    title?: string | undefined;
-
-    constructor(data?: ICreateTodoListCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.title = _data["title"];
-        }
-    }
-
-    static fromJS(data: any): CreateTodoListCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new CreateTodoListCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["title"] = this.title;
-        return data;
-    }
-}
-
-export interface ICreateTodoListCommand {
+export interface CreateTodoListCommand {
     title?: string | undefined;
 }
 
-export class UpdateTodoListCommand implements IUpdateTodoListCommand {
-    id?: number;
-    title?: string | undefined;
-
-    constructor(data?: IUpdateTodoListCommand) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.title = _data["title"];
-        }
-    }
-
-    static fromJS(data: any): UpdateTodoListCommand {
-        data = typeof data === 'object' ? data : {};
-        let result = new UpdateTodoListCommand();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["title"] = this.title;
-        return data;
-    }
-}
-
-export interface IUpdateTodoListCommand {
+export interface UpdateTodoListCommand {
     id?: number;
     title?: string | undefined;
 }
 
-export class ProblemDetails implements IProblemDetails {
-    type?: string | undefined;
-    title?: string | undefined;
-    status?: number | undefined;
-    detail?: string | undefined;
-    instance?: string | undefined;
-
-    [key: string]: any;
-
-    constructor(data?: IProblemDetails) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            this.type = _data["type"];
-            this.title = _data["title"];
-            this.status = _data["status"];
-            this.detail = _data["detail"];
-            this.instance = _data["instance"];
-        }
-    }
-
-    static fromJS(data: any): ProblemDetails {
-        data = typeof data === 'object' ? data : {};
-        let result = new ProblemDetails();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        data["type"] = this.type;
-        data["title"] = this.title;
-        data["status"] = this.status;
-        data["detail"] = this.detail;
-        data["instance"] = this.instance;
-        return data;
-    }
-}
-
-export interface IProblemDetails {
+export interface ProblemDetails {
     type?: string | undefined;
     title?: string | undefined;
     status?: number | undefined;
@@ -1786,404 +993,50 @@ export interface IProblemDetails {
     [key: string]: any;
 }
 
-export class HttpValidationProblemDetails extends ProblemDetails implements IHttpValidationProblemDetails {
-    errors?: { [key: string]: string[]; };
-
-    [key: string]: any;
-
-    constructor(data?: IHttpValidationProblemDetails) {
-        super(data);
-    }
-
-    override init(_data?: any) {
-        super.init(_data);
-        if (_data) {
-            for (var property in _data) {
-                if (_data.hasOwnProperty(property))
-                    this[property] = _data[property];
-            }
-            if (_data["errors"]) {
-                this.errors = {} as any;
-                for (let key in _data["errors"]) {
-                    if (_data["errors"].hasOwnProperty(key))
-                        (<any>this.errors)![key] = _data["errors"][key] !== undefined ? _data["errors"][key] : [];
-                }
-            }
-        }
-    }
-
-    static override fromJS(data: any): HttpValidationProblemDetails {
-        data = typeof data === 'object' ? data : {};
-        let result = new HttpValidationProblemDetails();
-        result.init(data);
-        return result;
-    }
-
-    override toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        for (var property in this) {
-            if (this.hasOwnProperty(property))
-                data[property] = this[property];
-        }
-        if (this.errors) {
-            data["errors"] = {};
-            for (let key in this.errors) {
-                if (this.errors.hasOwnProperty(key))
-                    (<any>data["errors"])[key] = (<any>this.errors)[key];
-            }
-        }
-        super.toJSON(data);
-        return data;
-    }
-}
-
-export interface IHttpValidationProblemDetails extends IProblemDetails {
+export interface HttpValidationProblemDetails extends ProblemDetails {
     errors?: { [key: string]: string[]; };
 
     [key: string]: any;
 }
 
-export class RegisterRequest implements IRegisterRequest {
-    email?: string;
-    password?: string;
-
-    constructor(data?: IRegisterRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.password = _data["password"];
-        }
-    }
-
-    static fromJS(data: any): RegisterRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new RegisterRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["password"] = this.password;
-        return data;
-    }
-}
-
-export interface IRegisterRequest {
+export interface RegisterRequest {
     email?: string;
     password?: string;
 }
 
-export class AccessTokenResponse implements IAccessTokenResponse {
-    tokenType?: string;
-    accessToken?: string;
-    expiresIn?: number;
-    refreshToken?: string;
-
-    constructor(data?: IAccessTokenResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.tokenType = _data["tokenType"];
-            this.accessToken = _data["accessToken"];
-            this.expiresIn = _data["expiresIn"];
-            this.refreshToken = _data["refreshToken"];
-        }
-    }
-
-    static fromJS(data: any): AccessTokenResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new AccessTokenResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["tokenType"] = this.tokenType;
-        data["accessToken"] = this.accessToken;
-        data["expiresIn"] = this.expiresIn;
-        data["refreshToken"] = this.refreshToken;
-        return data;
-    }
-}
-
-export interface IAccessTokenResponse {
+export interface AccessTokenResponse {
     tokenType?: string;
     accessToken?: string;
     expiresIn?: number;
     refreshToken?: string;
 }
 
-export class LoginRequest implements ILoginRequest {
-    email?: string;
-    password?: string;
-    twoFactorCode?: string | undefined;
-    twoFactorRecoveryCode?: string | undefined;
-
-    constructor(data?: ILoginRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.password = _data["password"];
-            this.twoFactorCode = _data["twoFactorCode"];
-            this.twoFactorRecoveryCode = _data["twoFactorRecoveryCode"];
-        }
-    }
-
-    static fromJS(data: any): LoginRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new LoginRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["password"] = this.password;
-        data["twoFactorCode"] = this.twoFactorCode;
-        data["twoFactorRecoveryCode"] = this.twoFactorRecoveryCode;
-        return data;
-    }
-}
-
-export interface ILoginRequest {
+export interface LoginRequest {
     email?: string;
     password?: string;
     twoFactorCode?: string | undefined;
     twoFactorRecoveryCode?: string | undefined;
 }
 
-export class RefreshRequest implements IRefreshRequest {
-    refreshToken?: string;
-
-    constructor(data?: IRefreshRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.refreshToken = _data["refreshToken"];
-        }
-    }
-
-    static fromJS(data: any): RefreshRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new RefreshRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["refreshToken"] = this.refreshToken;
-        return data;
-    }
-}
-
-export interface IRefreshRequest {
+export interface RefreshRequest {
     refreshToken?: string;
 }
 
-export class ResendConfirmationEmailRequest implements IResendConfirmationEmailRequest {
-    email?: string;
-
-    constructor(data?: IResendConfirmationEmailRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): ResendConfirmationEmailRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResendConfirmationEmailRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        return data;
-    }
-}
-
-export interface IResendConfirmationEmailRequest {
+export interface ResendConfirmationEmailRequest {
     email?: string;
 }
 
-export class ForgotPasswordRequest implements IForgotPasswordRequest {
-    email?: string;
-
-    constructor(data?: IForgotPasswordRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-        }
-    }
-
-    static fromJS(data: any): ForgotPasswordRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new ForgotPasswordRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        return data;
-    }
-}
-
-export interface IForgotPasswordRequest {
+export interface ForgotPasswordRequest {
     email?: string;
 }
 
-export class ResetPasswordRequest implements IResetPasswordRequest {
-    email?: string;
-    resetCode?: string;
-    newPassword?: string;
-
-    constructor(data?: IResetPasswordRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.resetCode = _data["resetCode"];
-            this.newPassword = _data["newPassword"];
-        }
-    }
-
-    static fromJS(data: any): ResetPasswordRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new ResetPasswordRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["resetCode"] = this.resetCode;
-        data["newPassword"] = this.newPassword;
-        return data;
-    }
-}
-
-export interface IResetPasswordRequest {
+export interface ResetPasswordRequest {
     email?: string;
     resetCode?: string;
     newPassword?: string;
 }
 
-export class TwoFactorResponse implements ITwoFactorResponse {
-    sharedKey?: string;
-    recoveryCodesLeft?: number;
-    recoveryCodes?: string[] | undefined;
-    isTwoFactorEnabled?: boolean;
-    isMachineRemembered?: boolean;
-
-    constructor(data?: ITwoFactorResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.sharedKey = _data["sharedKey"];
-            this.recoveryCodesLeft = _data["recoveryCodesLeft"];
-            if (Array.isArray(_data["recoveryCodes"])) {
-                this.recoveryCodes = [] as any;
-                for (let item of _data["recoveryCodes"])
-                    this.recoveryCodes!.push(item);
-            }
-            this.isTwoFactorEnabled = _data["isTwoFactorEnabled"];
-            this.isMachineRemembered = _data["isMachineRemembered"];
-        }
-    }
-
-    static fromJS(data: any): TwoFactorResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new TwoFactorResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["sharedKey"] = this.sharedKey;
-        data["recoveryCodesLeft"] = this.recoveryCodesLeft;
-        if (Array.isArray(this.recoveryCodes)) {
-            data["recoveryCodes"] = [];
-            for (let item of this.recoveryCodes)
-                data["recoveryCodes"].push(item);
-        }
-        data["isTwoFactorEnabled"] = this.isTwoFactorEnabled;
-        data["isMachineRemembered"] = this.isMachineRemembered;
-        return data;
-    }
-}
-
-export interface ITwoFactorResponse {
+export interface TwoFactorResponse {
     sharedKey?: string;
     recoveryCodesLeft?: number;
     recoveryCodes?: string[] | undefined;
@@ -2191,51 +1044,7 @@ export interface ITwoFactorResponse {
     isMachineRemembered?: boolean;
 }
 
-export class TwoFactorRequest implements ITwoFactorRequest {
-    enable?: boolean | undefined;
-    twoFactorCode?: string | undefined;
-    resetSharedKey?: boolean;
-    resetRecoveryCodes?: boolean;
-    forgetMachine?: boolean;
-
-    constructor(data?: ITwoFactorRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.enable = _data["enable"];
-            this.twoFactorCode = _data["twoFactorCode"];
-            this.resetSharedKey = _data["resetSharedKey"];
-            this.resetRecoveryCodes = _data["resetRecoveryCodes"];
-            this.forgetMachine = _data["forgetMachine"];
-        }
-    }
-
-    static fromJS(data: any): TwoFactorRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new TwoFactorRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["enable"] = this.enable;
-        data["twoFactorCode"] = this.twoFactorCode;
-        data["resetSharedKey"] = this.resetSharedKey;
-        data["resetRecoveryCodes"] = this.resetRecoveryCodes;
-        data["forgetMachine"] = this.forgetMachine;
-        return data;
-    }
-}
-
-export interface ITwoFactorRequest {
+export interface TwoFactorRequest {
     enable?: boolean | undefined;
     twoFactorCode?: string | undefined;
     resetSharedKey?: boolean;
@@ -2243,132 +1052,18 @@ export interface ITwoFactorRequest {
     forgetMachine?: boolean;
 }
 
-export class InfoResponse implements IInfoResponse {
-    email?: string;
-    isEmailConfirmed?: boolean;
-
-    constructor(data?: IInfoResponse) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.email = _data["email"];
-            this.isEmailConfirmed = _data["isEmailConfirmed"];
-        }
-    }
-
-    static fromJS(data: any): InfoResponse {
-        data = typeof data === 'object' ? data : {};
-        let result = new InfoResponse();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["email"] = this.email;
-        data["isEmailConfirmed"] = this.isEmailConfirmed;
-        return data;
-    }
-}
-
-export interface IInfoResponse {
+export interface InfoResponse {
     email?: string;
     isEmailConfirmed?: boolean;
 }
 
-export class InfoRequest implements IInfoRequest {
-    newEmail?: string | undefined;
-    newPassword?: string | undefined;
-    oldPassword?: string | undefined;
-
-    constructor(data?: IInfoRequest) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.newEmail = _data["newEmail"];
-            this.newPassword = _data["newPassword"];
-            this.oldPassword = _data["oldPassword"];
-        }
-    }
-
-    static fromJS(data: any): InfoRequest {
-        data = typeof data === 'object' ? data : {};
-        let result = new InfoRequest();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["newEmail"] = this.newEmail;
-        data["newPassword"] = this.newPassword;
-        data["oldPassword"] = this.oldPassword;
-        return data;
-    }
-}
-
-export interface IInfoRequest {
+export interface InfoRequest {
     newEmail?: string | undefined;
     newPassword?: string | undefined;
     oldPassword?: string | undefined;
 }
 
-export class WeatherForecast implements IWeatherForecast {
-    date?: string;
-    temperatureC?: number;
-    temperatureF?: number;
-    summary?: string | undefined;
-
-    constructor(data?: IWeatherForecast) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.date = _data["date"];
-            this.temperatureC = _data["temperatureC"];
-            this.temperatureF = _data["temperatureF"];
-            this.summary = _data["summary"];
-        }
-    }
-
-    static fromJS(data: any): WeatherForecast {
-        data = typeof data === 'object' ? data : {};
-        let result = new WeatherForecast();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["date"] = this.date;
-        data["temperatureC"] = this.temperatureC;
-        data["temperatureF"] = this.temperatureF;
-        data["summary"] = this.summary;
-        return data;
-    }
-}
-
-export interface IWeatherForecast {
+export interface WeatherForecast {
     date?: string;
     temperatureC?: number;
     temperatureF?: number;
@@ -2404,8 +1099,4 @@ function throwException(message: string, status: number, response: string, heade
         throw result;
     else
         throw new ApiException(message, status, response, headers, null);
-}
-
-function isAxiosError(obj: any): obj is AxiosError {
-    return obj && obj.isAxiosError === true;
 }

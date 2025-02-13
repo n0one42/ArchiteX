@@ -66,7 +66,7 @@
       "moduleName": "",
       "namespace": "",
       "typeScriptVersion": 4.3,
-      "template": "Axios",
+      "template": "Fetch",
       "promiseType": "Promise",
       "httpClass": "HttpClient",
       "withCredentials": true,
@@ -94,7 +94,7 @@
       "operationGenerationMode": "MultipleClientsFromFirstTagAndOperationId",
       "markOptionalProperties": true,
       "generateCloneMethod": false,
-      "typeStyle": "Class", // Has to be class! Axios and Interface sucks in nswag generation!
+      "typeStyle": "Interface", // Has to be class for Axios!
       "enumStyle": "Enum",
       "useLeafType": false,
       "classTypes": [],
