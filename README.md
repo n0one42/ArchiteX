@@ -93,3 +93,15 @@ I'm grateful to the open-source community for making it easy to "borrow" great i
 - [nextsolution](https://github.com/prince272/nextsolution)
 - [WebDevSimplified/course-platform](https://github.com/WebDevSimplified/course-platform)
 - [Build A Course Platform LMS With Next.js 15, React 19, Stripe, Drizzle, Shadcn, Postgres](https://www.youtube.com/watch?v=OAyQ3Wyyzfg)
+
+#### Temp notes:
+
+```bash
+dotnet tool install --global dotnet-ef --version 9.*
+dotnet ef database update --project src/Infrastructure --startup-project src/Web
+dotnet ef migrations add "SampleMigration" --project src\Infrastructure --startup-project src\Web --output-dir Data\Migrations
+```
+
+#### Strange errors:
+
+When making db changes, you may need to comment await app.InitialiseDatabaseAsync(); in Program.cs, rebuild project, run an migrations add, run database update and then uncomment await app.InitialiseDatabaseAsync(); in Program.cs.

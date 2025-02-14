@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { ApiException, UsersClient } from "@/api/client";
-import LoginWithGoogle from "./LoginWithGoogle";
+import LoginWithGoogle from "./LoginWithGoogle_clientside";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
