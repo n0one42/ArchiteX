@@ -13,8 +13,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { ApiException, UsersClient } from "@/api/client";
+import LoginWithGoogle from "./LoginWithGoogle";
 
-// Improved schema with additional validation rules
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z.string().min(6, { message: "Password must be at least 6 characters long" }),
@@ -137,12 +137,6 @@ export default function LoginPreview() {
                 >
                   Login
                 </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                >
-                  Login with Google
-                </Button>
               </div>
             </form>
           </Form>
@@ -154,6 +148,13 @@ export default function LoginPreview() {
             >
               Sign up
             </Link>
+          </div>
+          <hr className="my-4" />
+          <div className="flex flex-col gap-4">
+            {/* Google login */}
+            <LoginWithGoogle />
+            {/* Future providers can be added here */}
+            {/* e.g., <LoginWithFacebook /> */}
           </div>
         </CardContent>
       </Card>
