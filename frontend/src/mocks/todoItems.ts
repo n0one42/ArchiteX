@@ -4,8 +4,6 @@ import {
   TodoItemBriefDto,
   CreateTodoItemCommand,
   UpdateTodoItemCommand,
-  UpdateTodoItemDetailCommand,
-  PriorityLevel,
 } from "../api/client";
 
 // Mock data
@@ -87,9 +85,8 @@ export const todoItemHandlers = [
   }),
 
   // Update Todo Item Detail
-  http.put("*/api/TodoItems/UpdateDetail/:id", async ({ request, params }) => {
+  http.put("*/api/TodoItems/UpdateDetail/:id", async ({ params }) => {
     const id = parseInt(params.id as string);
-    const command = (await request.json()) as UpdateTodoItemDetailCommand;
     const itemIndex = demoTodoItems.findIndex((item) => item.id === id);
 
     if (itemIndex === -1) {

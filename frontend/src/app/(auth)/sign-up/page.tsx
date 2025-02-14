@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { UsersClient } from "@/api/client";
+import { ApiException, UsersClient } from "@/api/client";
 
 // Define validation schema using Zod
 const formSchema = z
@@ -57,11 +57,20 @@ export default function RegisterPreview() {
 
       toast.success("Registration successful! Please check your email to verify your account.");
       router.push("/sign-in");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Full error object:", error);
 
-      const errorMessage =
-        error.result?.detail || error.result?.title || error.message || "Failed to register. Please try again.";
+      let errorMessage: string;
+
+      if (ApiException.isApiException(error)) {
+        errorMessage =
+          error.result?.detail || error.result?.title || error.message || "Failed to register. Please try again.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = "Unknown error: " + error;
+      }
+
       console.warn("Registration error:", errorMessage);
       toast.error(errorMessage);
     }

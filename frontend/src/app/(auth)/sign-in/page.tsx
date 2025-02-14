@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { UsersClient } from "@/api/client";
+import { ApiException, UsersClient } from "@/api/client";
 
 // Improved schema with additional validation rules
 const formSchema = z.object({
@@ -52,13 +52,22 @@ export default function LoginPreview() {
         toast.success("Successfully logged in!");
         router.push("/"); // Redirect to home page
       }
-    } catch (error: any) {
-      const errorMessage =
-        error.result?.detail ||
-        error.result?.title ||
-        error.message ||
-        "Failed to login. Please check your credentials.";
-      console.warn("Login error:", error.result || error);
+    } catch (error: unknown) {
+      let errorMessage: string;
+
+      if (ApiException.isApiException(error)) {
+        errorMessage =
+          error.result?.detail ||
+          error.result?.title ||
+          error.message ||
+          "Failed to login. Please check your credentials.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = "Unknown error: " + error;
+      }
+
+      console.warn("Login error:", error);
       toast.error(errorMessage);
     }
   }
