@@ -6,37 +6,6 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/Users/sign-in/google": {
-      "get": {
-        "operationId": "GetApiUsersSignInGoogle",
-        "parameters": [
-          {
-            "name": "callbackUrl",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            },
-            "x-position": 1
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/api/Users/sign-in/google/callback": {
-      "get": {
-        "operationId": "GetApiUsersSignInGoogleCallback",
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        }
-      }
-    },
     "/api/TodoItems": {
       "get": {
         "tags": [
@@ -796,7 +765,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
       }
     }
   },

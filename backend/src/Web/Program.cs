@@ -2,20 +2,6 @@ using backend.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#if DEBUG
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("DevCorsPolicy", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
-#endif
-
 // Add services to the container.
 builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
@@ -27,22 +13,16 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-#if DEBUG
-    app.UseCors("DevCorsPolicy");
-#endif
-
-    app.UseExceptionHandler("/Error");
     await app.InitialiseDatabaseAsync();
 }
 else
 {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
-    app.UseHttpsRedirection();
 }
 
 app.UseHealthChecks("/health");
-
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseSwaggerUi(settings =>
