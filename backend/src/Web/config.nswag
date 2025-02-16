@@ -91,7 +91,7 @@
       "useTransformOptionsMethod": false,
       "useTransformResultMethod": false,
       "generateDtoTypes": true,
-      "operationGenerationMode": "MultipleClientsFromFirstTagAndOperationId",
+      "operationGenerationMode": "SingleClientFromOperationId",
       "markOptionalProperties": true,
       "generateCloneMethod": false,
       "typeStyle": "Interface", // Has to be class for Axios!
