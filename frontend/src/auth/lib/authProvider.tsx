@@ -32,12 +32,35 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
   const [error, setError] = useState<ApiException | null>(null);
   const [user, setUser] = useState<InfoResponse | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isCookieAuth, setIsCookieAuth] = useState(false);
 
   // API client instance with configured fetch
   const client = useMemo(() => apiClient, []);
 
   // Computed authentication state
-  const isAuthenticated = Boolean(tokens?.accessToken);
+  const isAuthenticated = Boolean(tokens?.accessToken || isCookieAuth);
+
+  // Check for existing cookie session
+  const checkCookieSession = useCallback(async () => {
+    try {
+      const userInfo = await client.getApiUsersManageInfo();
+      if (userInfo) {
+        setUser(userInfo);
+        setIsCookieAuth(true);
+      }
+    } catch (error) {
+      console.error("No valid cookie session found:", error);
+      setIsCookieAuth(false);
+      setUser(null);
+    }
+  }, [client]);
+
+  // Initialize auth state
+  useEffect(() => {
+    if (!tokens?.accessToken) {
+      checkCookieSession();
+    }
+  }, [tokens, checkCookieSession]);
 
   // Fetch user info
   const fetchUserInfo = useCallback(async () => {
