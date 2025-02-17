@@ -11,7 +11,13 @@ builder.Services.AddCors(options =>
     options.AddPolicy("DevCorsPolicy",
     policy =>
     {
-        policy.AllowAnyOrigin()
+        // IMPORTANT: When using credentials (cookies) you must specify the SetIsOriginAllowed or WithOrigins explicitly.
+#if DEBUG
+        policy.SetIsOriginAllowed(origin => true); // Allow any origin
+#else
+        policy.WithOrigins("http://localhost:5142");   // Replace "http://localhost:3000" with your Next.js app URL as needed.
+#endif
+        policy.AllowCredentials() // Allow credentials
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
