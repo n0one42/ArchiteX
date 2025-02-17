@@ -40,29 +40,7 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
   // Computed authentication state
   const isAuthenticated = Boolean(tokens?.accessToken || isCookieAuth);
 
-  // Check for existing cookie session
-  const checkCookieSession = useCallback(async () => {
-    try {
-      const userInfo = await client.getApiUsersManageInfo();
-      if (userInfo) {
-        setUser(userInfo);
-        setIsCookieAuth(true);
-      }
-    } catch (error) {
-      console.error("No valid cookie session found:", error);
-      setIsCookieAuth(false);
-      setUser(null);
-    }
-  }, [client]);
-
-  // Initialize auth state
-  useEffect(() => {
-    if (!tokens?.accessToken) {
-      checkCookieSession();
-    }
-  }, [tokens, checkCookieSession]);
-
-  // Fetch user info
+  // Fetch user info - only when authenticated
   const fetchUserInfo = useCallback(async () => {
     if (!isAuthenticated) return;
 
@@ -71,8 +49,37 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
       setUser(userInfo);
     } catch (error) {
       console.error("Failed to fetch user info:", error);
+      // If fetching user info fails, we should clear the auth state
+      setUser(null);
+      setIsCookieAuth(false);
     }
   }, [client, isAuthenticated]);
+
+  // Initialize auth state
+  useEffect(() => {
+    const initAuth = async () => {
+      // If we have tokens, we're using bearer auth
+      if (tokens?.accessToken) {
+        await fetchUserInfo();
+        return;
+      }
+
+      // Only check for cookie session if we don't have tokens
+      try {
+        const userInfo = await client.getApiUsersManageInfo();
+        if (userInfo) {
+          setUser(userInfo);
+          setIsCookieAuth(true);
+        }
+      } catch (error) {
+        // Silently handle failed cookie check - user is simply not logged in
+        setIsCookieAuth(false);
+        setUser(null);
+      }
+    };
+
+    initAuth();
+  }, [tokens, client, fetchUserInfo]);
 
   // Login function
   const login = useCallback(
@@ -92,6 +99,7 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
           };
           storeTokens(tokens);
           setTokens(tokens);
+          setIsCookieAuth(false);
         } else if (options?.useCookies) {
           // In cookie mode, you let the backend set the cookie.
           // Optionally, you could update your state to indicate you're "logged in"
@@ -99,6 +107,7 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
           // For example, you might clear any stored tokens:
           clearTokens();
           setTokens(null);
+          setIsCookieAuth(true);
         }
 
         await fetchUserInfo();
