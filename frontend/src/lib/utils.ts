@@ -24,7 +24,7 @@ export async function pkceChallengeFromVerifier(verifier: string): Promise<strin
   const encoder = new TextEncoder();
   const data = encoder.encode(verifier);
   const digest = await window.crypto.subtle.digest("SHA-256", data);
-  let base64String = btoa(String.fromCharCode(...new Uint8Array(digest)));
+  const base64String = btoa(String.fromCharCode(...new Uint8Array(digest)));
   // Convert Base64 to URL-safe Base64
   return base64String.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }

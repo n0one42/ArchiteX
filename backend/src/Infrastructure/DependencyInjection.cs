@@ -53,7 +53,7 @@ public static class DependencyInjection
         // Register cookie authentication with the scheme "Identity.Application"
         .AddCookie(IdentityConstants.ApplicationScheme, options =>
         {
-            options.Cookie.Name = ".AspNetCore.Identity.Application";
+            options.Cookie.Name = ".AspNetCore.Identity.Application";   // Name can be changed if wanted
         })
         // Register your bearer token scheme
         .AddBearerToken(IdentityConstants.BearerScheme);

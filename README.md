@@ -94,7 +94,7 @@ I'm grateful to the open-source community for making it easy to "borrow" great i
 - [WebDevSimplified/course-platform](https://github.com/WebDevSimplified/course-platform)
 - [Build A Course Platform LMS With Next.js 15, React 19, Stripe, Drizzle, Shadcn, Postgres](https://www.youtube.com/watch?v=OAyQ3Wyyzfg)
 
-#### Temp notes:
+#### Temp notes
 
 ```bash
 dotnet tool install --global dotnet-ef --version 9.*
@@ -102,6 +102,16 @@ dotnet ef database update --project src/Infrastructure --startup-project src/Web
 dotnet ef migrations add "SampleMigration" --project src\Infrastructure --startup-project src\Web --output-dir Data\Migrations
 ```
 
-#### Strange errors:
+For aspnet oauth2 local testing you have to add 127.0.0.1 architex-api.mydom.com to your hosts file and using this as the base url for your api.
+Test it with http://architex-api.mydom.com:5141/api/index.html?url=/api/specification.json
+.env => NEXT_PUBLIC_API_BASE_URL=http://architex-api.mydom.com:5141
+
+Authorized JavaScript origins:
+http://architex-api.mydom.com:5141
+
+Authorized redirect URIs:
+http://architex-api.mydom.com:5141/api/Users/sign-in/google/callback
+
+#### Strange errors
 
 When making db changes, you may need to comment await app.InitialiseDatabaseAsync(); in Program.cs, rebuild project, run an migrations add, run database update and then uncomment await app.InitialiseDatabaseAsync(); in Program.cs.

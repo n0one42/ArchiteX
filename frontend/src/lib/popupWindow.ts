@@ -1,3 +1,4 @@
+// src/lib/popupWindow.ts
 export interface PopupWindowFeatures {
   width?: number;
   height?: number;
@@ -85,7 +86,7 @@ export class PopupWindow {
     }
 
     return Object.entries(finalFeatures)
-      .filter(([_, value]) => typeof value === "boolean" || typeof value === "number")
+      .filter(([, value]) => typeof value === "boolean" || typeof value === "number")
       .map(([key, value]) => `${key}=${value}`)
       .join(",");
   }

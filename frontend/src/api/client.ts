@@ -48,10 +48,6 @@ export interface IClient {
 
     postApiUsersManageInfo(infoRequest: InfoRequest): Promise<InfoResponse>;
 
-    getApiUsersSignInGoogle(callbackUrl?: string | null | undefined): Promise<void>;
-
-    getApiUsersSignInGoogleCallback(): Promise<void>;
-
     getWeatherForecasts(): Promise<WeatherForecast[]>;
 }
 
@@ -832,70 +828,6 @@ export class Client implements IClient {
             });
         }
         return Promise.resolve<InfoResponse>(null as any);
-    }
-
-    getApiUsersSignInGoogle(callbackUrl?: string | null | undefined, signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/Users/sign-in/google?";
-        if (callbackUrl !== undefined && callbackUrl !== null)
-            url_ += "callbackUrl=" + encodeURIComponent("" + callbackUrl) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            signal,
-            headers: {
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetApiUsersSignInGoogle(_response);
-        });
-    }
-
-    protected processGetApiUsersSignInGoogle(response: Response): Promise<void> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            return;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    getApiUsersSignInGoogleCallback(signal?: AbortSignal): Promise<void> {
-        let url_ = this.baseUrl + "/api/Users/sign-in/google/callback";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            signal,
-            headers: {
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetApiUsersSignInGoogleCallback(_response);
-        });
-    }
-
-    protected processGetApiUsersSignInGoogleCallback(response: Response): Promise<void> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            return;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<void>(null as any);
     }
 
     getWeatherForecasts(signal?: AbortSignal): Promise<WeatherForecast[]> {

@@ -1,9 +1,9 @@
+import { JwtAuthProvider } from "@/auth/lib/authProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemedToaster } from "@/components/themed-toaster";
-
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata } from "next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -33,18 +33,20 @@ export default function RootLayout({
     >
       <head />
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="fixed top-4 right-4 z-50">
-            <ModeToggle />
-          </div>
-          {children}
-          <ThemedToaster />
-        </ThemeProvider>
+        <JwtAuthProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <div className="fixed top-4 right-4 z-50">
+              <ModeToggle />
+            </div>
+            {children}
+            <ThemedToaster />
+          </ThemeProvider>
+        </JwtAuthProvider>
       </body>
     </html>
   );
