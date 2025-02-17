@@ -3,6 +3,7 @@ using backend.Domain.Constants;
 using backend.Infrastructure.Data;
 using backend.Infrastructure.Data.Interceptors;
 using backend.Infrastructure.Identity;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -54,6 +55,16 @@ public static class DependencyInjection
         .AddCookie(IdentityConstants.ApplicationScheme, options =>
         {
             options.Cookie.Name = ".AspNetCore.Identity.Application";   // Name can be changed if wanted
+            options.Cookie.HttpOnly = true;
+            //  options.Cookie.Domain = "architex-api.mydom.com";
+            options.ExpireTimeSpan = TimeSpan.FromDays(7);              // Set the cookie to expire after 7 days of inactivity.
+            options.SlidingExpiration = true;
+#if DEBUG
+            options.Cookie.SameSite = SameSiteMode.Lax;              // Mitigate CSRF attacks (SameSiteMode.Lax for balance and SameSiteMode.Strict for max security) Test it!
+#else
+            options.Cookie.SameSite = SameSiteMode.Strict;              // Mitigate CSRF attacks (SameSiteMode.Lax for balance and SameSiteMode.Strict for max security) Test it!
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;    // Require HTTPS in production
+#endif
         })
         // Register your bearer token scheme
         .AddBearerToken(IdentityConstants.BearerScheme);
