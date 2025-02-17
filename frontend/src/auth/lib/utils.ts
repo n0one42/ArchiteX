@@ -1,16 +1,30 @@
 // frontend/src/auth/lib/utils.ts
 
-import { AuthTokens, TOKEN_REFRESH_THRESHOLD } from "./types";
+/**
+ * Auth Token Storage Utilities
+ *
+ * This module handles the persistence layer for auth tokens, separating storage concerns
+ * from the main authentication state management in authProvider.
+ *
+ * While these utilities are currently only used by authProvider, keeping them separate:
+ * 1. Maintains clear separation between storage and state management
+ * 2. Improves testability of storage operations
+ * 3. Keeps the authProvider focused on state management
+ */
+
+// Re-export the type from the API client
+import { AccessTokenResponse } from "@/api/client";
 
 // Store tokens in localStorage
-export function storeTokens(tokens: AuthTokens): void {
+export function storeTokens(tokens: AccessTokenResponse): void {
   if (typeof window === "undefined") return;
 
   try {
-    localStorage.setItem("accessToken", tokens.accessToken);
-    localStorage.setItem("refreshToken", tokens.refreshToken);
-    localStorage.setItem("tokenType", tokens.tokenType);
-    localStorage.setItem("expiresIn", tokens.expiresIn.toString());
+    // We know these values exist from the backend
+    localStorage.setItem("accessToken", tokens.accessToken!);
+    localStorage.setItem("refreshToken", tokens.refreshToken!);
+    localStorage.setItem("tokenType", tokens.tokenType!);
+    localStorage.setItem("expiresIn", tokens.expiresIn!.toString());
   } catch (error) {
     console.error("Error storing tokens:", error);
     clearTokens();
@@ -18,7 +32,7 @@ export function storeTokens(tokens: AuthTokens): void {
 }
 
 // Get tokens from localStorage
-export function getAuthTokens(): AuthTokens | null {
+export function getAuthTokens(): AccessTokenResponse | null {
   if (typeof window === "undefined") return null;
 
   try {
@@ -57,10 +71,4 @@ export function clearTokens(): void {
 // Check if token is expired
 export function isTokenExpired(expirationTime: number): boolean {
   return Date.now() >= expirationTime;
-}
-
-// Check if token needs refresh
-export function needsRefresh(expirationTime: number): boolean {
-  const timeLeft = expirationTime - Date.now();
-  return timeLeft <= TOKEN_REFRESH_THRESHOLD;
 }

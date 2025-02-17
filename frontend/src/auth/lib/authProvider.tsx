@@ -1,11 +1,24 @@
 // frontend/src/auth/lib/authProvider.tsx
 
+/**
+ * JWT Authentication Provider
+ *
+ * This provider manages the authentication state and logic for the application.
+ * It delegates token storage operations to the utils module to maintain separation
+ * of concerns between state management and persistence.
+ *
+ * The provider focuses on:
+ * - Managing auth state
+ * - Handling token refresh
+ * - User information
+ * - Login/logout operations
+ */
+
 "use client";
 
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./authContext";
-import { AuthTokens, TOKEN_REFRESH_THRESHOLD } from "./types";
-import { ApiException, InfoResponse, LoginRequest } from "@/api/client";
+import { AccessTokenResponse, ApiException, InfoResponse, LoginRequest } from "@/api/client";
 import apiClient from "@/api/fetchInstance";
 import { getAuthTokens, storeTokens, clearTokens, isTokenExpired } from "./utils";
 
@@ -14,7 +27,7 @@ interface JwtAuthProviderProps {
 }
 
 export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
-  const [tokens, setTokens] = useState<AuthTokens | null>(() => getAuthTokens());
+  const [tokens, setTokens] = useState<AccessTokenResponse | null>(() => getAuthTokens());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ApiException | null>(null);
   const [user, setUser] = useState<InfoResponse | null>(null);
@@ -48,7 +61,7 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
         const response = await client.postApiUsersLogin(request, options?.useCookies, options?.useSessionCookies);
 
         if (!options?.useCookies && response.accessToken) {
-          const tokens: AuthTokens = {
+          const tokens: AccessTokenResponse = {
             tokenType: response.tokenType!,
             accessToken: response.accessToken,
             refreshToken: response.refreshToken!,
@@ -58,7 +71,7 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
           setTokens(tokens);
         } else if (options?.useCookies) {
           // In cookie mode, you let the backend set the cookie.
-          // Optionally, you could update your state to indicate you're “logged in”
+          // Optionally, you could update your state to indicate you're "logged in"
           // without storing tokens in localStorage.
           // For example, you might clear any stored tokens:
           clearTokens();
@@ -108,7 +121,7 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
       });
 
       if (response.accessToken) {
-        const newTokens: AuthTokens = {
+        const newTokens: AccessTokenResponse = {
           tokenType: response.tokenType!,
           accessToken: response.accessToken,
           refreshToken: response.refreshToken!,
@@ -176,8 +189,11 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
       return;
     }
 
-    // Calculate time until refresh (5 minutes before expiry)
-    const timeUntilRefresh = tokens.expiresIn - Date.now() - TOKEN_REFRESH_THRESHOLD;
+    // Calculate time until refresh (X minutes before expiry)
+    const timeUntilRefresh =
+      tokens.expiresIn -
+      Date.now() -
+      (Number(process.env.NEXT_PUBLIC_TOKEN_REFRESH_THRESHOLD_MINUTES) || 5) * 60 * 1000;
 
     // Only set up refresh if we're not too close to expiry
     if (timeUntilRefresh <= 0) {
