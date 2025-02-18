@@ -12,11 +12,11 @@ export default function Page() {
   const [toDoListResponse, setToDoListResponse] = useState<TodosVm | null>(null);
   const [error, setError] = useState<ApiException | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { login, tokens } = useAuth();
+  const { login } = useAuth();
 
   const testLoginRequest: LoginRequest = {
-    email: "test@test.de",
-    password: "Test#1234",
+    email: "administrator@localhost",
+    password: "Administrator1!",
   };
 
   // Log in using bearer mode (tokens stored in localStorage)

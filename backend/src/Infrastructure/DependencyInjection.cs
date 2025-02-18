@@ -57,7 +57,6 @@ public static class DependencyInjection
         {
             options.Cookie.Name = ".AspNetCore.Identity.Application";   // Name can be changed if wanted
             options.Cookie.HttpOnly = true;
-            //  options.Cookie.Domain = "architex-api.mydom.com";
             options.ExpireTimeSpan = TimeSpan.FromDays(7);              // Set the cookie to expire after 7 days of inactivity.
             options.SlidingExpiration = true;
 
