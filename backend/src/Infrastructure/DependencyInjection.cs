@@ -3,6 +3,7 @@ using backend.Domain.Constants;
 using backend.Infrastructure.Data;
 using backend.Infrastructure.Data.Interceptors;
 using backend.Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -59,12 +60,25 @@ public static class DependencyInjection
             //  options.Cookie.Domain = "architex-api.mydom.com";
             options.ExpireTimeSpan = TimeSpan.FromDays(7);              // Set the cookie to expire after 7 days of inactivity.
             options.SlidingExpiration = true;
-#if DEBUG
-            options.Cookie.SameSite = SameSiteMode.Lax;              // Mitigate CSRF attacks (SameSiteMode.Lax for balance and SameSiteMode.Strict for max security) Test it!
-#else
+
+            // You can not use SameSiteMode.None without https! To make your life easier, always use https and a domain even through /etc/hosts if using cookies
             options.Cookie.SameSite = SameSiteMode.Strict;              // Mitigate CSRF attacks (SameSiteMode.Lax for balance and SameSiteMode.Strict for max security) Test it!
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;    // Require HTTPS in production
-#endif
+
+            // Prevent 302 redirects for API calls - return 401 instead.
+            options.Events = new CookieAuthenticationEvents
+            {
+                OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = 401;
+                    return Task.CompletedTask;
+                },
+                OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = 403;
+                    return Task.CompletedTask;
+                }
+            };
         })
         // Register your bearer token scheme
         .AddBearerToken(IdentityConstants.BearerScheme);

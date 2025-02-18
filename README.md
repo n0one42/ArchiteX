@@ -102,6 +102,7 @@ dotnet ef database update --project src/Infrastructure --startup-project src/Web
 dotnet ef migrations add "SampleMigration" --project src\Infrastructure --startup-project src\Web --output-dir Data\Migrations
 ```
 
+IMPORTANT: you can not use SameSiteMode.None without HTTPS
 For aspnet oauth2 local testing you have to add 127.0.0.1 architex-api.mydom.com to your hosts file and using this as the base url for your api.
 Test it with http://architex-api.mydom.com:5141/api/index.html?url=/api/specification.json
 .env => NEXT_PUBLIC_API_BASE_URL=http://architex-api.mydom.com:5141

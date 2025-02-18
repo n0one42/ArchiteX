@@ -36,6 +36,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 #if DEBUG
 app.UseCors("DevCorsPolicy");
+//app.UseCookiePolicy(new CookiePolicyOptions // This is the global one which overrides all the other settings inside DependencyInjection. Mostly not needed.
+// IMPORTANT: you can not use SameSiteMode.None without HTTPS - To make your life easier, always use https and a domain even through /etc/hosts if using cookies
+//{
+//    MinimumSameSitePolicy = SameSiteMode.None,
+//    Secure = CookieSecurePolicy.Always,
+//});
 app.UseExceptionHandler("/Error");
 await app.InitialiseDatabaseAsync();
 #else
@@ -43,6 +49,10 @@ await app.InitialiseDatabaseAsync();
 app.UseHsts();
 app.UseHttpsRedirection();
 #endif
+
+// Essential for cookie authentication
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHealthChecks("/health");
 app.UseStaticFiles();
