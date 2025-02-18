@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 // import { toast } from "sonner";
 import { useAuth } from "@/auth/lib/authContext";
-import { FormEvent } from "react";
-import { LoginRequest } from "@/api/client";
+import { FormEvent, useState } from "react";
+import { LoginRequest, ApiException } from "@/api/client";
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
@@ -26,32 +26,79 @@ const formSchema = z.object({
   twoFactorRecoveryCode: z.string().optional(),
 });
 
+const testLoginRequest: LoginRequest = {
+  email: "administrator@localhost" as string,
+  password: "Administrator1!" as string,
+};
+
 // Derive the type from the schema
 type LoginFormValues = z.infer<typeof formSchema>;
 
 export default function LoginForm() {
   const { login, error, clearError, isLoading } = useAuth();
+  const [errorState, setError] = useState<ApiException | null>(null);
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
-      twoFactorCode: "",
-      twoFactorRecoveryCode: "",
     },
   });
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleBearerLogin = async (e: FormEvent) => {
     e.preventDefault();
     clearError();
-
     try {
       const loginRequest: LoginRequest = form.getValues();
-      await login(loginRequest);
+      await login(loginRequest, { useCookies: false });
       // Redirect will be handled by middleware
-    } catch (error) {
-      // Error state is already set by auth provider
-      console.error(error);
+    } catch (err) {
+      if (err instanceof ApiException) {
+        setError(err);
+      } else {
+        setError(
+          new ApiException(
+            "An unexpected error occurred",
+            500,
+            err instanceof Error ? err.message : "Unknown error",
+            {},
+            null
+          )
+        );
+      }
+      console.error("Bearer Login Error:", err);
+    }
+  };
+
+  const handleCookieLogin = async (e: FormEvent) => {
+    e.preventDefault();
+    clearError();
+    try {
+      const loginRequest: LoginRequest = form.getValues();
+      await login(loginRequest, { useCookies: true, useSessionCookies: true });
+      // Redirect will be handled by middleware
+    } catch (err) {
+      if (err instanceof ApiException) {
+        setError(err);
+      } else {
+        setError(
+          new ApiException(
+            "An unexpected error occurred",
+            500,
+            err instanceof Error ? err.message : "Unknown error",
+            {},
+            null
+          )
+        );
+      }
+      console.error("Cookie Login Error:", err);
+    }
+  };
+
+  const handleTestAccount = () => {
+    if (testLoginRequest.email && testLoginRequest.password) {
+      form.setValue("email", testLoginRequest.email);
+      form.setValue("password", testLoginRequest.password);
     }
   };
 
@@ -64,11 +111,10 @@ export default function LoginForm() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form
-              onSubmit={handleSubmit}
-              className="space-y-8"
-            >
-              {error && <div className="error">{error.message}</div>}
+            <form className="space-y-8">
+              {(error || errorState) && (
+                <div className="text-red-500 text-sm">{error?.message || errorState?.message}</div>
+              )}
               <div className="grid gap-4">
                 <FormField
                   control={form.control}
@@ -115,19 +161,32 @@ export default function LoginForm() {
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Logging in..." : "Login"}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                >
-                  Login with Google
-                </Button>
+                <div className="grid gap-2">
+                  <Button
+                    onClick={handleCookieLogin}
+                    className="w-full"
+                    variant="default"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Logging in..." : "Login with Cookie"}
+                  </Button>
+                  <Button
+                    onClick={handleBearerLogin}
+                    className="w-full"
+                    variant="secondary"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Logging in..." : "Login with Bearer"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleTestAccount}
+                    type="button"
+                  >
+                    Use testing account
+                  </Button>
+                </div>
               </div>
             </form>
           </Form>
