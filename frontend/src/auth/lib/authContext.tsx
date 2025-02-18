@@ -10,13 +10,10 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: ApiException | null;
-  tokens: AccessTokenResponse | null;
   user: InfoResponse | null;
   login: (request: LoginRequest, options?: { useCookies?: boolean; useSessionCookies?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
-  refreshTokens: () => Promise<void>;
   clearError: () => void;
-  getAccessToken: () => string | null;
   isTokenExpired: () => boolean;
 }
 

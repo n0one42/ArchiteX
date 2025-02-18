@@ -250,28 +250,13 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
       isAuthenticated,
       isLoading,
       error,
-      tokens,
       user,
       login,
       logout,
-      refreshTokens,
       clearError,
-      getAccessToken,
       isTokenExpired: checkTokenExpired,
     }),
-    [
-      isAuthenticated,
-      isLoading,
-      error,
-      tokens,
-      user,
-      login,
-      logout,
-      refreshTokens,
-      clearError,
-      getAccessToken,
-      checkTokenExpired,
-    ]
+    [isAuthenticated, isLoading, error, user, login, logout, clearError, checkTokenExpired]
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
