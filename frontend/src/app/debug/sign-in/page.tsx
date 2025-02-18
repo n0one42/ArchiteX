@@ -1,14 +1,17 @@
+// frontend/src/app/debug/sign-in/page.tsx
+
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/auth/lib/authContext";
 import { useState } from "react";
-import { AccessTokenResponse, ApiException, LoginRequest } from "@/api/client";
+import { AccessTokenResponse, ApiException, LoginRequest, TodosVm } from "@/api/client";
 import apiClient from "@/api/fetchInstance";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function Page() {
   const [bearerResponse, setBearerResponse] = useState<AccessTokenResponse | null>(null);
+  const [toDoListResponse, setToDoListResponse] = useState<TodosVm | null>(null);
   const [error, setError] = useState<ApiException | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { login, user } = useAuth();
@@ -73,6 +76,18 @@ export default function Page() {
     }
   };
 
+  const getToDoList = async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.getTodoLists();
+      setToDoListResponse(response);
+    } catch (err) {
+      console.error("Get ToDo List Error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
@@ -98,6 +113,15 @@ export default function Page() {
               </Button>
             </div>
 
+            <Button
+              variant="outline"
+              onClick={getToDoList}
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Fetching ToDo List..." : "Test getToDoList"}
+            </Button>
+
             {bearerResponse && (
               <div className="p-4 bg-gray-700 rounded animate-in fade-in slide-in-from-top-4">
                 <h3 className="text-white mb-2 font-semibold">Bearer Response:</h3>
@@ -112,6 +136,15 @@ export default function Page() {
                 <h3 className="text-white mb-2 font-semibold">User Information:</h3>
                 <pre className="text-sm text-white whitespace-pre-wrap overflow-auto max-h-60">
                   {JSON.stringify(user, null, 2)}
+                </pre>
+              </div>
+            )}
+
+            {toDoListResponse && (
+              <div className="p-4 bg-gray-700 rounded animate-in fade-in slide-in-from-top-4">
+                <h3 className="text-white mb-2 font-semibold">ToDo List Response:</h3>
+                <pre className="text-sm text-white whitespace-pre-wrap overflow-auto max-h-60">
+                  {JSON.stringify(toDoListResponse, null, 2)}
                 </pre>
               </div>
             )}
