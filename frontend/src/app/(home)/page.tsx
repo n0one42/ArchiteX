@@ -4,6 +4,7 @@ import { useAuth } from "@/auth/lib/authContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function Home() {
   const { user, logout } = useAuth();
@@ -34,6 +35,18 @@ export default function Home() {
             >
               Test Toasts
             </Button>
+            <Link
+              href="/debug"
+              className="w-full"
+            >
+              <Button
+                variant="outline"
+                className="w-full"
+                type="button"
+              >
+                Debug Page
+              </Button>
+            </Link>
             <Button
               onClick={handleSignOut}
               className="w-full"

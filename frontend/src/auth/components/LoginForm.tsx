@@ -188,6 +188,14 @@ export default function LoginForm() {
                   >
                     Use testing account
                   </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => (window.location.href = "/debug")}
+                    type="button"
+                  >
+                    Debug Mode
+                  </Button>
                 </div>
               </div>
             </form>

@@ -8,6 +8,7 @@ import { useState } from "react";
 import { TodosVm } from "@/api/client";
 import apiClient from "@/api/fetchInstance";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function Page() {
   const [toDoListResponse, setToDoListResponse] = useState<TodosVm | null>(null);
@@ -49,6 +50,18 @@ export default function Page() {
               >
                 {showUserInfo ? "Hide User Info" : "Show User Info"}
               </Button>
+              <Link
+                href="/"
+                className="w-full"
+              >
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  type="button"
+                >
+                  Main Page
+                </Button>
+              </Link>
             </div>
 
             {toDoListResponse && (
