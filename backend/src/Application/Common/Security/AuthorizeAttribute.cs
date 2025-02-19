@@ -1,4 +1,6 @@
-﻿namespace backend.Application.Common.Security;
+﻿using backend.Domain.Constants;
+
+namespace backend.Application.Common.Security;
 
 /// <summary>
 /// Specifies the class this attribute is applied to requires authorization.
@@ -12,9 +14,9 @@ public class AuthorizeAttribute : Attribute
     public AuthorizeAttribute() { }
 
     /// <summary>
-    /// Gets or sets a comma delimited list of roles that are allowed to access the resource.
+    /// Gets or sets an array of roles that are allowed to access the resource.
     /// </summary>
-    public string Roles { get; set; } = string.Empty;
+    public RolesEnum[] Roles { get; set; } = Array.Empty<RolesEnum>();
 
     /// <summary>
     /// Gets or sets the policy name that determines access to the resource.

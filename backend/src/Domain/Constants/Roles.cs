@@ -1,6 +1,10 @@
-﻿namespace backend.Domain.Constants;
+﻿using System.Text.Json.Serialization;
 
-public abstract class Roles
+namespace backend.Domain.Constants;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum RolesEnum
 {
-    public const string Administrator = nameof(Administrator);
+    Administrator,
+    // Add other roles here as needed
 }

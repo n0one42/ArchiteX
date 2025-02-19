@@ -4,7 +4,7 @@ using backend.Domain.Constants;
 
 namespace backend.Application.TodoLists.Commands.PurgeTodoLists;
 
-[Authorize(Roles = Roles.Administrator)]
+[Authorize(Roles = [RolesEnum.Administrator])]
 [Authorize(Policy = Policies.CanPurge)]
 public record PurgeTodoListsCommand : IRequest;
 

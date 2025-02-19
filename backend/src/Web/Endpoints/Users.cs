@@ -1,8 +1,7 @@
 ﻿using backend.Infrastructure.Identity;
-using backend.Domain.Enums;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
+using backend.Domain.Constants;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace backend.Web.Endpoints;
 
@@ -12,8 +11,26 @@ public class Users : EndpointGroupBase
     {
         var group = app.MapGroup(this);
         group.MapIdentityApi<ApplicationUser>();
+        group.MapGet("userRoles", GetUserRoles).RequireAuthorization();
         // group.MapGet("sign-in/google", SignInWithGoogle);
         // group.MapGet("sign-in/google/callback", GoogleCallback);
+    }
+
+    private async Task<Results<Ok<IEnumerable<RolesEnum>>, ForbidHttpResult>> GetUserRoles(HttpContext context, UserManager<ApplicationUser> userManager)
+    {
+        var user = await userManager.GetUserAsync(context.User);
+        if (user is null)
+        {
+            return TypedResults.Forbid();
+        }
+
+        var roles = await userManager.GetRolesAsync(user);
+
+        var roleEnums = roles
+            .Select(r => Enum.TryParse<RolesEnum>(r, out var roleEnum) ? roleEnum : (RolesEnum?)null)
+            .OfType<RolesEnum>();
+
+        return TypedResults.Ok(roleEnums);
     }
 
     // public IResult SignInWithGoogle(string? callbackUrl, HttpContext context)

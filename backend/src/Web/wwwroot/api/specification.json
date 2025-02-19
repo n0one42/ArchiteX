@@ -745,6 +745,34 @@
         ]
       }
     },
+    "/api/Users/userRoles": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "GetApiUsersUserRoles",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RolesEnum"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/WeatherForecasts": {
       "get": {
         "tags": [
@@ -1228,6 +1256,16 @@
             "nullable": true
           }
         }
+      },
+      "RolesEnum": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Administrator"
+        ],
+        "enum": [
+          "Administrator"
+        ]
       },
       "WeatherForecast": {
         "type": "object",
