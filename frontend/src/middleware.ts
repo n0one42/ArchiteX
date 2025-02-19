@@ -1,12 +1,30 @@
-import type { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+// src/middleware.ts
+import { NextResponse, NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
-  // const res = NextResponse.next();
-  // res.cookies.set("newCookie", "004");
+export function middleware(req: NextRequest) {
+  const { pathname, search } = req.nextUrl;
 
-  console.log("response.cookies", cookies());
+  // Skip middleware for static files or if already on /sign-in
+  if (pathname.startsWith("/sign-in") || pathname.startsWith("/_next")) {
+    return NextResponse.next();
+  }
 
-  const authCookie = request.cookies.get("AspNetCoreIdentityApplication");
-  console.log("authCookie", authCookie);
+  // Check for the authentication cookie
+  const authCookie = req.cookies.get("AspNetCoreIdentityApplication")?.value;
+  if (!authCookie) {
+    // Clone the current URL to modify it
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = "/sign-in";
+    // Append the originally requested URL as a query parameter
+    redirectUrl.searchParams.set("redirect", pathname + search);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // If authenticated, let the request continue
+  return NextResponse.next();
 }
+
+// Optionally restrict the middleware to specific paths
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};

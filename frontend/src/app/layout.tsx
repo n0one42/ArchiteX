@@ -1,4 +1,4 @@
-import { JwtAuthProvider } from "@/auth/lib/authProvider";
+import { AuthProvider } from "@/auth/lib/authProvider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ModeToggle } from "@/components/mode-toggle";
 import { ThemedToaster } from "@/components/themed-toaster";
@@ -33,7 +33,7 @@ export default function RootLayout({
     >
       <head />
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans`}>
-        <JwtAuthProvider>
+        <AuthProvider>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -46,7 +46,7 @@ export default function RootLayout({
             {children}
             <ThemedToaster />
           </ThemeProvider>
-        </JwtAuthProvider>
+        </AuthProvider>
       </body>
     </html>
   );

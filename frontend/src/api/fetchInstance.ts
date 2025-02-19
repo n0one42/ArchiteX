@@ -8,23 +8,10 @@ if (!process.env.NEXT_PUBLIC_API_BASE_URL) {
 
 // Custom fetch handler that adds auth token
 const customFetch = async (url: RequestInfo, init?: RequestInit): Promise<Response> => {
-  // Get the current access token from localStorage
-  const accessToken = localStorage.getItem("accessToken");
-  const tokenType = localStorage.getItem("tokenType");
-
-  // Clone the headers to avoid modifying the original
-  const headers = new Headers(init?.headers || {});
-
-  // Add auth header if we have a token
-  if (accessToken && tokenType) {
-    headers.set("Authorization", `${tokenType} ${accessToken}`);
-  }
-
   // Create new init object with updated headers
   const updatedInit: RequestInit = {
     ...init,
     credentials: "include", // ensures HttpOnly cookies are sent
-    headers,
   };
 
   // Make the request

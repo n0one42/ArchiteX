@@ -1,49 +1,24 @@
-// frontend/src/auth/lib/authProvider.tsx
-
-/**
- * JWT Authentication Provider
- *
- * This provider manages the authentication state and logic for the application.
- * It delegates token storage operations to the utils module to maintain separation
- * of concerns between state management and persistence.
- *
- * The provider focuses on:
- * - Managing auth state
- * - Handling token refresh
- * - User information
- * - Login/logout operations
- */
-
 "use client";
 
 import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./authContext";
-import { AccessTokenResponse, ApiException, InfoResponse, LoginRequest } from "@/api/client";
+import { ApiException, InfoResponse, LoginRequest } from "@/api/client";
 import apiClient from "@/api/fetchInstance";
-import { getAuthTokens, storeTokens, clearTokens, isTokenExpired } from "./utils";
 
-interface JwtAuthProviderProps {
+interface AuthProviderProps {
   children: ReactNode;
 }
 
-export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
-  const [tokens, setTokens] = useState<AccessTokenResponse | null>(() => getAuthTokens());
+export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ApiException | null>(null);
   const [user, setUser] = useState<InfoResponse | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isCookieAuth, setIsCookieAuth] = useState(false);
 
   // API client instance with configured fetch
   const client = useMemo(() => apiClient, []);
 
-  // Computed authentication state
-  const isAuthenticated = Boolean(tokens?.accessToken || isCookieAuth);
-
   // Fetch user info - only when authenticated
   const fetchUserInfo = useCallback(async () => {
-    if (!isAuthenticated) return;
-
     try {
       const userInfo = await client.getApiUsersManageInfo();
       setUser(userInfo);
@@ -51,35 +26,8 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
       console.error("Failed to fetch user info:", error);
       // If fetching user info fails, we should clear the auth state
       setUser(null);
-      setIsCookieAuth(false);
     }
-  }, [client, isAuthenticated]);
-
-  // Initialize auth state
-  useEffect(() => {
-    const initAuth = async () => {
-      // If we have tokens, we're using bearer auth
-      if (tokens?.accessToken) {
-        await fetchUserInfo();
-        return;
-      }
-
-      // Only check for cookie session if we don't have tokens
-      try {
-        const userInfo = await client.getApiUsersManageInfo();
-        if (userInfo) {
-          setUser(userInfo);
-          setIsCookieAuth(true);
-        }
-      } catch (error) {
-        // Silently handle failed cookie check - user is simply not logged in
-        setIsCookieAuth(false);
-        setUser(null);
-      }
-    };
-
-    initAuth();
-  }, [tokens, client, fetchUserInfo]);
+  }, [client]);
 
   // Login function
   const login = useCallback(
@@ -88,29 +36,19 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
       setError(null);
 
       try {
-        const response = await client.postApiUsersLogin(request, options?.useCookies, options?.useSessionCookies);
-
-        if (!options?.useCookies && response.accessToken) {
-          const tokens: AccessTokenResponse = {
-            tokenType: response.tokenType!,
-            accessToken: response.accessToken,
-            refreshToken: response.refreshToken!,
-            expiresIn: Date.now() + response.expiresIn! * 1000, // Convert seconds to milliseconds and add to current time
-          };
-          storeTokens(tokens);
-          setTokens(tokens);
-          setIsCookieAuth(false);
-        } else if (options?.useCookies) {
-          // In cookie mode, you let the backend set the cookie.
-          // Optionally, you could update your state to indicate you're "logged in"
-          // without storing tokens in localStorage.
-          // For example, you might clear any stored tokens:
-          clearTokens();
-          setTokens(null);
-          setIsCookieAuth(true);
-        }
-
+        // The backend returns an OK status with no content,
+        // so we don't need to check for a loginResponse value.
+        await client.postApiUsersLogin(request, options?.useCookies, options?.useSessionCookies);
         await fetchUserInfo();
+
+        // Check for a redirect query parameter and redirect if it exists
+        const params = new URLSearchParams(window.location.search);
+        const redirectUrl = params.get("redirect");
+        if (redirectUrl) {
+          // Remove the redirect query parameter from the URL
+          window.history.replaceState(null, "", window.location.pathname);
+          window.location.href = redirectUrl;
+        }
       } catch (error: unknown) {
         if (ApiException.isApiException(error)) {
           setError(error);
@@ -131,132 +69,56 @@ export function JwtAuthProvider({ children }: JwtAuthProviderProps) {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      clearTokens();
-      setTokens(null);
+      // Dummy call: Call backend logout endpoint to clear cookies (implement later)
+      // await client.postApiUsersLogout();
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
-
-  // Refresh tokens function
-  const refreshTokens = useCallback(async () => {
-    if (!tokens?.refreshToken || isRefreshing) return;
-
-    setIsRefreshing(true);
-    setIsLoading(true);
-    try {
-      const response = await client.postApiUsersRefresh({
-        refreshToken: tokens.refreshToken,
-      });
-
-      if (response.accessToken) {
-        const newTokens: AccessTokenResponse = {
-          tokenType: response.tokenType!,
-          accessToken: response.accessToken,
-          refreshToken: response.refreshToken!,
-          expiresIn: response.expiresIn!,
-        };
-        storeTokens(newTokens);
-        setTokens(newTokens);
-      }
-    } catch (error: unknown) {
-      if (ApiException.isApiException(error)) {
-        setError(error);
-      } else {
-        setError(
-          new ApiException("Token refresh failed", 401, "Your session has expired. Please log in again.", {}, error)
-        );
-      }
-      clearTokens();
-      setTokens(null);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [client, tokens, isRefreshing]);
+  }, [client]);
 
   // Clear error function
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
-  // Get access token function
-  const getAccessToken = useCallback(() => {
-    return tokens?.accessToken ?? null;
-  }, [tokens]);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const currentPath = window.location.pathname;
+      if (!currentPath.startsWith("/sign-in") && !currentPath.startsWith("/sign-out")) {
+        fetchUserInfo();
+      }
+    }
+  }, [fetchUserInfo]);
 
-  // Check if current token is expired
-  const checkTokenExpired = useCallback(() => {
-    if (!tokens?.expiresIn) return true;
-    return isTokenExpired(tokens.expiresIn);
-  }, [tokens]);
-
-  // Handle unauthorized events (401 responses)
+  // Listen for unauthorized events triggered by the API client (e.g., from a 401 response)
   useEffect(() => {
     const handleUnauthorized = () => {
-      if (!checkTokenExpired()) {
-        refreshTokens();
-      } else {
-        clearTokens();
-        setTokens(null);
-        setUser(null);
-      }
+      console.warn("Received unauthorized event, clearing user state.");
+      setUser(null);
+      // Save the current URL as a redirect parameter
+      const redirectUrl = window.location.pathname + window.location.search;
+      window.location.href = `/sign-in?redirect=${encodeURIComponent(redirectUrl)}`;
     };
 
     window.addEventListener("auth:unauthorized", handleUnauthorized);
-    return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
-  }, [refreshTokens, checkTokenExpired]);
-
-  // Auto refresh tokens before expiry
-  useEffect(() => {
-    if (!tokens?.accessToken || !tokens?.expiresIn) return;
-
-    // Only set up refresh if token is not already expired
-    if (isTokenExpired(tokens.expiresIn)) {
-      refreshTokens();
-      return;
-    }
-
-    // Calculate time until refresh (X minutes before expiry)
-    const timeUntilRefresh =
-      tokens.expiresIn -
-      Date.now() -
-      (Number(process.env.NEXT_PUBLIC_TOKEN_REFRESH_THRESHOLD_MINUTES) || 5) * 60 * 1000;
-
-    // Only set up refresh if we're not too close to expiry
-    if (timeUntilRefresh <= 0) {
-      refreshTokens();
-      return;
-    }
-
-    console.log(`Token refresh scheduled in ${timeUntilRefresh / 1000} seconds`);
-    const refreshTimer = setTimeout(refreshTokens, timeUntilRefresh);
-    return () => clearTimeout(refreshTimer);
-  }, [tokens, refreshTokens]);
-
-  // Fetch user info on mount if authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchUserInfo();
-    }
-  }, [isAuthenticated, fetchUserInfo]);
+    return () => {
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+    };
+  }, []);
 
   const contextValue = useMemo(
     () => ({
-      isAuthenticated,
       isLoading,
       error,
       user,
       login,
       logout,
       clearError,
-      isTokenExpired: checkTokenExpired,
     }),
-    [isAuthenticated, isLoading, error, user, login, logout, clearError, checkTokenExpired]
+    [isLoading, error, user, login, logout, clearError]
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

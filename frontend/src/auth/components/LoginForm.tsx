@@ -47,37 +47,12 @@ export default function LoginForm() {
     },
   });
 
-  const handleBearerLogin = async (e: FormEvent) => {
-    e.preventDefault();
-    clearError();
-    try {
-      const loginRequest: LoginRequest = form.getValues();
-      await login(loginRequest, { useCookies: false });
-      // Redirect will be handled by middleware
-    } catch (err) {
-      if (err instanceof ApiException) {
-        setError(err);
-      } else {
-        setError(
-          new ApiException(
-            "An unexpected error occurred",
-            500,
-            err instanceof Error ? err.message : "Unknown error",
-            {},
-            null
-          )
-        );
-      }
-      console.error("Bearer Login Error:", err);
-    }
-  };
-
   const handleCookieLogin = async (e: FormEvent) => {
     e.preventDefault();
     clearError();
     try {
       const loginRequest: LoginRequest = form.getValues();
-      await login(loginRequest, { useCookies: true, useSessionCookies: true });
+      await login(loginRequest, { useCookies: true, useSessionCookies: false });
       // Redirect will be handled by middleware
     } catch (err) {
       if (err instanceof ApiException) {
@@ -171,14 +146,6 @@ export default function LoginForm() {
                     disabled={isLoading}
                   >
                     {isLoading ? "Logging in..." : "Login with Cookie"}
-                  </Button>
-                  <Button
-                    onClick={handleBearerLogin}
-                    className="w-full"
-                    variant="secondary"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Logging in..." : "Login with Bearer"}
                   </Button>
                   <Button
                     variant="outline"
