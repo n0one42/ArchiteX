@@ -10,7 +10,10 @@
     "dev-https": "next dev --turbopack --experimental-https --port 3142",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint:check": "next lint src",
+    "lint:fix": "next lint --fix src",
+    "prettier:check": "prettier --check src",
+    "prettier:fix": "prettier --write src"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.0.0",
@@ -33,11 +36,16 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@next/eslint-plugin-next": "^15.1.7",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
     "eslint": "^9",
     "eslint-config-next": "15.1.7",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-boundaries": "^5.0.1",
+    "eslint-plugin-perfectionist": "^4.9.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
     "msw": "^2.7.0",
     "postcss": "^8",
     "prettier": "^3.5.0",

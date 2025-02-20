@@ -1,9 +1,10 @@
 "use client";
 
-import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
-import { AuthContext } from "./authContext";
 import { ApiException, InfoResponse, LoginRequest } from "@/api/client";
 import apiClient from "@/api/fetchInstance";
+import { ReactNode, useCallback, useEffect, useMemo, useState } from "react";
+
+import { AuthContext } from "./authContext";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -69,15 +70,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Dummy call: Call backend logout endpoint to clear cookies (implement later)
-      // await client.postApiUsersLogout();
+      // The backend handles authentication cookies statelessly, so no explicit logout endpoint call is needed
       setUser(null);
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [client]);
+  }, []);
 
   // Clear error function
   const clearError = useCallback(() => {
@@ -111,12 +111,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const contextValue = useMemo(
     () => ({
-      isLoading,
+      clearError,
       error,
-      user,
+      isLoading,
       login,
       logout,
-      clearError,
+      user,
     }),
     [isLoading, error, user, login, logout, clearError]
   );

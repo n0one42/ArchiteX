@@ -15,3 +15,10 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+// ? Notes
+// Recommended rule-sets from the following ESLint plugins are all used within eslint-config-next:
+// - eslint-plugin-react
+// - eslint-plugin-react-hooks
+// - eslint-plugin-next
+// This will take precedence over the configuration from next.config.js.

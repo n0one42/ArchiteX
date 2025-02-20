@@ -5,10 +5,10 @@
  */
 const config = {
   semi: true,
+  singleQuote: false,
   tabWidth: 2,
   endOfLine: "lf",
   printWidth: 120,
-  singleQuote: false,
   trailingComma: "es5",
   singleAttributePerLine: true,
 };

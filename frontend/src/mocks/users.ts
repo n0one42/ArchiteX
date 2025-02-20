@@ -1,26 +1,27 @@
-import { AccessTokenResponse, InfoResponse, RegisterRequest, LoginRequest, TwoFactorResponse } from "../api/client";
 import { http, HttpResponse } from "msw";
+
+import { AccessTokenResponse, InfoResponse, LoginRequest, RegisterRequest, TwoFactorResponse } from "../api/client";
 
 // Demo user data
 export const users = [
   {
     email: "john.doe@example.com",
-    password: "Password123!",
     isEmailConfirmed: true,
+    password: "Password123!",
   },
   {
     email: "jane.smith@example.com",
-    password: "Password456!",
     isEmailConfirmed: false,
+    password: "Password456!",
   },
 ];
 
 // Mock responses
 export const demoAccessTokenResponse: AccessTokenResponse = {
-  tokenType: "Bearer",
   accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   expiresIn: 3600,
   refreshToken: "refresh_token_example",
+  tokenType: "Bearer",
 };
 
 // Create demo info response with default user
@@ -31,67 +32,67 @@ export const demoInfoResponse: InfoResponse = {
 };
 
 export const demoTwoFactorResponse: TwoFactorResponse = {
-  sharedKey: "ABCDEFGHIJKLMNOP",
-  recoveryCodesLeft: 10,
-  recoveryCodes: ["CODE1-XXXXX", "CODE2-XXXXX", "CODE3-XXXXX"],
-  isTwoFactorEnabled: true,
   isMachineRemembered: false,
+  isTwoFactorEnabled: true,
+  recoveryCodes: ["CODE1-XXXXX", "CODE2-XXXXX", "CODE3-XXXXX"],
+  recoveryCodesLeft: 10,
+  sharedKey: "ABCDEFGHIJKLMNOP",
 };
 
 // Error response type matching the API
 interface ErrorResponse {
-  type: string;
-  title: string;
-  status: number;
   detail: string;
+  status: number;
+  title: string;
+  type: string;
 }
 
 // Standard error responses
 const unauthorizedError: ErrorResponse = {
-  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
-  title: "Unauthorized",
-  status: 401,
   detail: "Failed",
+  status: 401,
+  title: "Unauthorized",
+  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
 };
 
 const invalidCredentialsError: ErrorResponse = {
-  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
-  title: "Invalid Credentials",
-  status: 401,
   detail: "The provided credentials are incorrect",
+  status: 401,
+  title: "Invalid Credentials",
+  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
 };
 
 const emailNotConfirmedError: ErrorResponse = {
-  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
-  title: "Email Not Confirmed",
-  status: 401,
   detail: "Please confirm your email before logging in",
+  status: 401,
+  title: "Email Not Confirmed",
+  type: "https://tools.ietf.org/html/rfc9110#section-15.5.2",
 };
 
 // Helper functions for mock handlers
 export const finduser = (email: string) => users.find((user) => user.email === email);
 
-export const validateDemoLogin = (login: LoginRequest): { isValid: boolean; error?: ErrorResponse } => {
+export const validateDemoLogin = (login: LoginRequest): { error?: ErrorResponse; isValid: boolean } => {
   const user = finduser(login.email!);
 
   if (!user) {
     return {
-      isValid: false,
       error: invalidCredentialsError,
+      isValid: false,
     };
   }
 
   if (!user.isEmailConfirmed) {
     return {
-      isValid: false,
       error: emailNotConfirmedError,
+      isValid: false,
     };
   }
 
   if (user.password !== login.password) {
     return {
-      isValid: false,
       error: invalidCredentialsError,
+      isValid: false,
     };
   }
 
@@ -112,10 +113,10 @@ export const userHandlers = [
     }
     return HttpResponse.json(
       {
-        type: "https://tools.ietf.org/html/rfc9110#section-15.5.4",
-        title: "Email Already Exists",
-        status: 400,
         detail: "An account with this email already exists",
+        status: 400,
+        title: "Email Already Exists",
+        type: "https://tools.ietf.org/html/rfc9110#section-15.5.4",
       },
       { status: 400 }
     );

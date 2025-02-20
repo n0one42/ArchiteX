@@ -1,15 +1,15 @@
 "use client";
 
-import { createContext, useContext } from "react";
 import { ApiException, InfoResponse, LoginRequest } from "@/api/client";
+import { createContext, useContext } from "react";
 
 interface AuthContextType {
-  isLoading: boolean;
+  clearError: () => void;
   error: ApiException | null;
-  user: InfoResponse | null;
+  isLoading: boolean;
   login: (request: LoginRequest, options?: { useCookies?: boolean; useSessionCookies?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
-  clearError: () => void;
+  user: InfoResponse | null;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
