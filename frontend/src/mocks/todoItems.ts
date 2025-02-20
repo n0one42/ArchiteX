@@ -1,35 +1,36 @@
 import { http, HttpResponse } from "msw";
+
 import {
+  CreateTodoItemCommand,
   PaginatedListOfTodoItemBriefDto,
   TodoItemBriefDto,
-  CreateTodoItemCommand,
   UpdateTodoItemCommand,
 } from "../api/client";
 
 // Mock data
 export const demoTodoItems: TodoItemBriefDto[] = [
   {
+    done: false,
     id: 1,
     listId: 1,
     title: "Complete project documentation",
-    done: false,
   },
   {
+    done: true,
     id: 2,
     listId: 1,
     title: "Review pull requests",
-    done: true,
   },
 ];
 
 // Mock paginated response
 export const demoPaginatedTodoItems: PaginatedListOfTodoItemBriefDto = {
+  hasNextPage: false,
+  hasPreviousPage: false,
   items: demoTodoItems,
   pageNumber: 1,
-  totalPages: 1,
   totalCount: demoTodoItems.length,
-  hasPreviousPage: false,
-  hasNextPage: false,
+  totalPages: 1,
 };
 
 // Mock handlers for todo items
@@ -43,17 +44,17 @@ export const todoItemHandlers = [
   http.post("*/api/TodoItems", async ({ request }) => {
     const command = (await request.json()) as CreateTodoItemCommand;
     const newItem: TodoItemBriefDto = {
+      done: false,
       id: demoTodoItems.length + 1,
       listId: command.listId,
       title: command.title,
-      done: false,
     };
     demoTodoItems.push(newItem);
     return HttpResponse.json(newItem.id, { status: 201 });
   }),
 
   // Update Todo Item
-  http.put("*/api/TodoItems/:id", async ({ request, params }) => {
+  http.put("*/api/TodoItems/:id", async ({ params, request }) => {
     const id = parseInt(params.id as string);
     const command = (await request.json()) as UpdateTodoItemCommand;
     const itemIndex = demoTodoItems.findIndex((item) => item.id === id);
@@ -64,8 +65,8 @@ export const todoItemHandlers = [
 
     demoTodoItems[itemIndex] = {
       ...demoTodoItems[itemIndex],
-      title: command.title ?? demoTodoItems[itemIndex]?.title,
       done: command.done ?? demoTodoItems[itemIndex]?.done,
+      title: command.title ?? demoTodoItems[itemIndex]?.title,
     };
 
     return new HttpResponse(null, { status: 204 });

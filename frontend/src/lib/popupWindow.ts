@@ -1,27 +1,27 @@
 // src/lib/popupWindow.ts
 export interface PopupWindowFeatures {
-  width?: number;
+  center?: boolean;
   height?: number;
   left?: number;
-  top?: number;
-  menubar?: boolean;
-  toolbar?: boolean;
   location?: boolean;
+  menubar?: boolean;
   resizable?: boolean;
   scrollbars?: boolean;
   status?: boolean;
-  center?: boolean;
+  toolbar?: boolean;
+  top?: number;
+  width?: number;
 }
 
 export interface PopupWindowResult {
   provider: string;
-  token: string;
   requestId: string;
+  token: string;
 }
 
 export class PopupWindow {
-  private popupWindow: Window | null = null;
-  private pollTimer: number | null = null;
+  private pollTimer: null | number = null;
+  private popupWindow: null | Window = null;
 
   public open(url: string, features?: PopupWindowFeatures): Promise<PopupWindowResult> {
     return new Promise((resolve, reject) => {
@@ -64,15 +64,15 @@ export class PopupWindow {
 
   private stringifyFeatures(features?: PopupWindowFeatures): string {
     const defaultFeatures: PopupWindowFeatures = {
-      width: 550,
+      center: true,
       height: 650,
-      menubar: false,
-      toolbar: false,
       location: false,
+      menubar: false,
       resizable: true,
       scrollbars: true,
       status: false,
-      center: true,
+      toolbar: false,
+      width: 550,
     };
     const finalFeatures = { ...defaultFeatures, ...features };
 

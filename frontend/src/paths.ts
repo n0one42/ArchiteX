@@ -1,10 +1,9 @@
 export const paths = {
-  root: "/",
   auth: {
-    signIn: "/sign-in",
-    signUp: "/sign-up",
     forgotPassword: "/forgot-password",
     resetPassword: "/reset-password",
+    signIn: "/sign-in",
+    signUp: "/sign-up",
   },
   dashboard: {
     root: "/dashboard",
@@ -13,6 +12,7 @@ export const paths = {
   debug: {
     root: "/debug",
   },
+  root: "/",
   testing: {
     root: "/testing",
   },

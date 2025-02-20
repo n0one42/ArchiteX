@@ -1,43 +1,42 @@
 "use client";
 
-import Link from "next/link";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 // Define validation schema using Zod
 const formSchema = z
   .object({
-    name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
+    confirmPassword: z.string(),
     email: z.string().email({ message: "Invalid email address" }),
-    phone: z.string().min(10, { message: "Phone number must be valid" }),
+    name: z.string().min(2, { message: "Name must be at least 2 characters long" }),
     password: z
       .string()
       .min(6, { message: "Password must be at least 6 characters long" })
       .regex(/[a-zA-Z0-9]/, { message: "Password must be alphanumeric" }),
-    confirmPassword: z.string(),
+    phone: z.string().min(10, { message: "Phone number must be valid" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    path: ["confirmPassword"],
     message: "Passwords do not match",
+    path: ["confirmPassword"],
   });
 
 export default function RegisterForm() {
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
       confirmPassword: "",
+      email: "",
+      name: "",
+      password: "",
     },
+    resolver: zodResolver(formSchema),
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -65,8 +64,8 @@ export default function RegisterForm() {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-8"
+              onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="grid gap-4">
                 {/* Name Field */}
@@ -97,10 +96,10 @@ export default function RegisterForm() {
                       <FormLabel htmlFor="email">Email</FormLabel>
                       <FormControl>
                         <Input
+                          autoComplete="email"
                           id="email"
                           placeholder="johndoe@mail.com"
                           type="email"
-                          autoComplete="email"
                           {...field}
                         />
                       </FormControl>
@@ -118,9 +117,9 @@ export default function RegisterForm() {
                       <FormLabel htmlFor="password">Password</FormLabel>
                       <FormControl>
                         <PasswordInput
+                          autoComplete="new-password"
                           id="password"
                           placeholder="******"
-                          autoComplete="new-password"
                           {...field}
                         />
                       </FormControl>
@@ -138,9 +137,9 @@ export default function RegisterForm() {
                       <FormLabel htmlFor="confirmPassword">Confirm Password</FormLabel>
                       <FormControl>
                         <PasswordInput
+                          autoComplete="new-password"
                           id="confirmPassword"
                           placeholder="******"
-                          autoComplete="new-password"
                           {...field}
                         />
                       </FormControl>
@@ -150,8 +149,8 @@ export default function RegisterForm() {
                 />
 
                 <Button
-                  type="submit"
                   className="w-full"
+                  type="submit"
                 >
                   Register
                 </Button>
@@ -161,8 +160,8 @@ export default function RegisterForm() {
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}
             <Link
-              href="/sign-in"
               className="underline"
+              href="/sign-in"
             >
               Login
             </Link>

@@ -1,6 +1,6 @@
-import { userHandlers } from "./users";
 import { todoItemHandlers } from "./todoItems";
 import { todoListHandlers } from "./todoLists";
+import { userHandlers } from "./users";
 import { weatherForecastHandlers } from "./weatherForecasts";
 
 export const handlers = [

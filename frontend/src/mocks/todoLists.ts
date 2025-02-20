@@ -1,43 +1,44 @@
 import { http, HttpResponse } from "msw";
+
 import {
-  TodosVm,
-  TodoListDto,
-  LookupDto,
   CreateTodoListCommand,
-  UpdateTodoListCommand,
+  LookupDto,
   PriorityLevel,
+  TodoListDto,
+  TodosVm,
+  UpdateTodoListCommand,
 } from "../api/client";
 
 // Mock data
 export const demoTodoLists: TodoListDto[] = [
   {
-    id: 1,
-    title: "Work Tasks",
     colour: "#ff0000",
+    id: 1,
     items: [
       {
+        done: false,
         id: 1,
         listId: 1,
-        title: "Complete project documentation",
-        done: false,
-        priority: PriorityLevel.High,
         note: "Include all API endpoints",
+        priority: PriorityLevel.High,
+        title: "Complete project documentation",
       },
       {
+        done: true,
         id: 2,
         listId: 1,
-        title: "Review pull requests",
-        done: true,
-        priority: PriorityLevel.Medium,
         note: "Check code quality",
+        priority: PriorityLevel.Medium,
+        title: "Review pull requests",
       },
     ],
+    title: "Work Tasks",
   },
   {
-    id: 2,
-    title: "Personal Tasks",
     colour: "#00ff00",
+    id: 2,
     items: [],
+    title: "Personal Tasks",
   },
 ];
 
@@ -49,8 +50,8 @@ export const demoPriorityLevels: LookupDto[] = [
 ];
 
 export const demoTodosVm: TodosVm = {
-  priorityLevels: demoPriorityLevels,
   lists: demoTodoLists,
+  priorityLevels: demoPriorityLevels,
 };
 
 // Mock handlers for todo lists
@@ -64,17 +65,17 @@ export const todoListHandlers = [
   http.post("*/api/TodoLists", async ({ request }) => {
     const command = (await request.json()) as CreateTodoListCommand;
     const newList: TodoListDto = {
+      colour: `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color
       id: demoTodoLists.length + 1,
-      title: command.title,
-      colour: "#" + Math.floor(Math.random() * 16777215).toString(16), // Random color
       items: [],
+      title: command.title,
     };
     demoTodoLists.push(newList);
     return HttpResponse.json(newList.id, { status: 201 });
   }),
 
   // Update Todo List
-  http.put("*/api/TodoLists/:id", async ({ request, params }) => {
+  http.put("*/api/TodoLists/:id", async ({ params, request }) => {
     const id = parseInt(params.id as string);
     const command = (await request.json()) as UpdateTodoListCommand;
     const listIndex = demoTodoLists.findIndex((list) => list.id === id);

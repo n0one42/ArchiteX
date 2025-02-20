@@ -2,16 +2,16 @@
 
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/auth/lib/authContext";
-import { useState } from "react";
 import { TodosVm } from "@/api/client";
 import apiClient from "@/api/fetchInstance";
+import { useAuth } from "@/auth/lib/authContext";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Page() {
-  const [toDoListResponse, setToDoListResponse] = useState<TodosVm | null>(null);
+  const [toDoListResponse, setToDoListResponse] = useState<null | TodosVm>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const [showUserInfo, setShowUserInfo] = useState(false);
@@ -35,29 +35,29 @@ export default function Page() {
           <CardContent className="pt-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Button
-                variant="outline"
-                onClick={getToDoList}
-                disabled={isLoading}
                 className="w-full"
+                disabled={isLoading}
+                onClick={getToDoList}
+                variant="outline"
               >
                 {isLoading ? "Fetching ToDo List..." : "Get ToDo List"}
               </Button>
 
               <Button
-                variant="outline"
-                onClick={() => setShowUserInfo(!showUserInfo)}
                 className="w-full"
+                onClick={() => setShowUserInfo(!showUserInfo)}
+                variant="outline"
               >
                 {showUserInfo ? "Hide User Info" : "Show User Info"}
               </Button>
               <Link
-                href="/"
                 className="w-full"
+                href="/"
               >
                 <Button
-                  variant="outline"
                   className="w-full"
                   type="button"
+                  variant="outline"
                 >
                   Main Page
                 </Button>

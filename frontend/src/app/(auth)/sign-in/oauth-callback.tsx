@@ -6,8 +6,8 @@ const OAuthCallback: React.FC = () => {
     if (window.opener) {
       window.opener.postMessage(
         {
-          type: "oauth_callback",
           data: { linkingUrl: window.location.href },
+          type: "oauth_callback",
         },
         window.location.origin // Only accept messages from our own origin
       );

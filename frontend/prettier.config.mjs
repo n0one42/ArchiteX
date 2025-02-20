@@ -4,13 +4,13 @@
  * Open the command palette (Ctrl + Shift + P) and execute the command > Reload Window.
  */
 const config = {
-  semi: true,
-  singleQuote: false,
-  tabWidth: 2,
   endOfLine: "lf",
   printWidth: 120,
-  trailingComma: "es5",
+  semi: true,
   singleAttributePerLine: true,
+  singleQuote: false,
+  tabWidth: 2,
+  trailingComma: "es5",
 };
 
 export default config;

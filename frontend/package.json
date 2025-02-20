@@ -10,8 +10,8 @@
     "dev-https": "next dev --turbopack --experimental-https --port 3142",
     "build": "next build",
     "start": "next start",
-    "lint:check": "next lint src",
-    "lint:fix": "next lint --fix src",
+    "lint:check": "next lint",
+    "lint:fix": "next lint --fix",
     "prettier:check": "prettier --check src",
     "prettier:fix": "prettier --write src"
   },
@@ -45,6 +45,7 @@
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-boundaries": "^5.0.1",
     "eslint-plugin-perfectionist": "^4.9.0",
+    "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-react-hooks": "^5.1.0",
     "msw": "^2.7.0",
     "postcss": "^8",

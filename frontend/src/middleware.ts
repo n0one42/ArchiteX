@@ -1,5 +1,5 @@
 // src/middleware.ts
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;

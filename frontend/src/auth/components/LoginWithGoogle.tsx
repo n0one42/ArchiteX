@@ -1,6 +1,6 @@
+import { PopupWindow } from "@/lib/popupWindow";
 // src/app/(auth)/sign-in/LoginWithGoogle.tsx
 import React from "react";
-import { PopupWindow } from "@/lib/popupWindow";
 
 const LoginWithGoogle: React.FC = () => {
   const handleLogin = async () => {
@@ -20,8 +20,8 @@ const LoginWithGoogle: React.FC = () => {
 
       // Complete the sign-in by calling the backend with the token
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/Users/sign-in/google/${result.token}`, {
-        method: "POST",
         credentials: "include", // ensures HttpOnly cookies are sent
+        method: "POST",
       });
 
       if (!response.ok) {

@@ -1,25 +1,26 @@
 import { http, HttpResponse } from "msw";
+
 import { WeatherForecast } from "../api/client";
 
 // Mock data
 export const demoWeatherForecasts: WeatherForecast[] = [
   {
     date: new Date(2024, 0, 1).toISOString(),
+    summary: "Mild",
     temperatureC: 20,
     temperatureF: 68,
-    summary: "Mild",
   },
   {
     date: new Date(2024, 0, 2).toISOString(),
+    summary: "Warm",
     temperatureC: 25,
     temperatureF: 77,
-    summary: "Warm",
   },
   {
     date: new Date(2024, 0, 3).toISOString(),
+    summary: "Cool",
     temperatureC: 15,
     temperatureF: 59,
-    summary: "Cool",
   },
 ];
 

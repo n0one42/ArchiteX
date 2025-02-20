@@ -1,8 +1,11 @@
 import { FlatCompat } from "@eslint/eslintrc";
 // import boundaries from "eslint-plugin-boundaries";
 import perfectionist from "eslint-plugin-perfectionist";
+import prettier from "eslint-plugin-prettier";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
+
+import prettierConfig from "./prettier.config.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -12,7 +15,25 @@ const compat = new FlatCompat({
 });
 
 // Next.js / TypeScript + Prettier base config via FlatCompat
-const baseConfig = [...compat.extends("next/core-web-vitals", "next/typescript", "prettier")];
+const baseConfig = [
+  ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
+  {
+    rules: {
+      "prefer-arrow-callback": "error",
+      "prefer-template": "error",
+    },
+  },
+];
+
+// Prettier integration: Run Prettier as an ESLint rule and apply your prettierConfig
+const prettierIntegration = {
+  plugins: {
+    prettier,
+  },
+  rules: {
+    "prettier/prettier": ["error", prettierConfig],
+  },
+};
 
 // Custom boundaries config from your old .eslintrc.json
 // const boundariesConfig = {
@@ -98,6 +119,6 @@ const perfectionistConfig = {
     ...perfectionist.configs["recommended-natural"].rules,
   },
 };
-const config = [...baseConfig, perfectionistConfig]; // TODO: add boundariesConfig after migration
+const config = [...baseConfig, perfectionistConfig, prettierIntegration]; // TODO: add boundariesConfig after migration
 
 export default config;

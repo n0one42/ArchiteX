@@ -2,20 +2,19 @@
 
 "use client";
 
-import Link from "next/link";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { ApiException, LoginRequest } from "@/api/client";
 // import { toast } from "sonner";
 import { useAuth } from "@/auth/lib/authContext";
-import { FormEvent, useState } from "react";
-import { LoginRequest, ApiException } from "@/api/client";
-
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { FormEvent, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 // Form schema matches LoginRequest interface
 const formSchema = z.object({
@@ -37,14 +36,14 @@ const testLoginRequest: LoginRequest = {
 type LoginFormValues = z.infer<typeof formSchema>;
 
 export default function LoginForm() {
-  const { login, error, clearError, isLoading } = useAuth();
+  const { clearError, error, isLoading, login } = useAuth();
   const [errorState, setError] = useState<ApiException | null>(null);
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
+    resolver: zodResolver(formSchema),
   });
 
   const handleCookieLogin = async (e: FormEvent) => {
@@ -101,10 +100,10 @@ export default function LoginForm() {
                       <FormLabel htmlFor="email">Email</FormLabel>
                       <FormControl>
                         <Input
+                          autoComplete="email"
                           id="email"
                           placeholder="johndoe@mail.com"
                           type="email"
-                          autoComplete="email"
                           {...field}
                         />
                       </FormControl>
@@ -120,17 +119,17 @@ export default function LoginForm() {
                       <div className="flex justify-between items-center">
                         <FormLabel htmlFor="password">Password</FormLabel>
                         <Link
-                          href="#"
                           className="ml-auto inline-block text-sm underline"
+                          href="#"
                         >
                           Forgot your password?
                         </Link>
                       </div>
                       <FormControl>
                         <PasswordInput
+                          autoComplete="current-password"
                           id="password"
                           placeholder="******"
-                          autoComplete="current-password"
                           {...field}
                         />
                       </FormControl>
@@ -140,26 +139,26 @@ export default function LoginForm() {
                 />
                 <div className="grid gap-2">
                   <Button
-                    onClick={handleCookieLogin}
                     className="w-full"
-                    variant="default"
                     disabled={isLoading}
+                    onClick={handleCookieLogin}
+                    variant="default"
                   >
                     {isLoading ? "Logging in..." : "Login with Cookie"}
                   </Button>
                   <Button
-                    variant="outline"
                     className="w-full"
                     onClick={handleTestAccount}
                     type="button"
+                    variant="outline"
                   >
                     Use testing account
                   </Button>
                   <Button
-                    variant="ghost"
                     className="w-full"
                     onClick={() => (window.location.href = "/debug")}
                     type="button"
+                    variant="ghost"
                   >
                     Debug Mode
                   </Button>
@@ -170,8 +169,8 @@ export default function LoginForm() {
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
             <Link
-              href="/sign-up"
               className="underline"
+              href="/sign-up"
             >
               Sign up
             </Link>

@@ -1,13 +1,13 @@
 "use client";
 
 import { useAuth } from "@/auth/lib/authContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export default function Home() {
-  const { user, logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const handleSignOut = async () => {
     await logout();
@@ -24,32 +24,32 @@ export default function Home() {
         <CardContent>
           <div className="flex flex-col gap-4">
             <Button
+              className="w-full"
               onClick={() => {
                 toast.success("This is a success toast!");
                 toast.error("This is an error toast!");
                 toast.info("This is an info toast!");
                 toast.warning("This is a warning toast!");
               }}
-              className="w-full"
               variant="outline"
             >
               Test Toasts
             </Button>
             <Link
-              href="/debug"
               className="w-full"
+              href="/debug"
             >
               <Button
-                variant="outline"
                 className="w-full"
                 type="button"
+                variant="outline"
               >
                 Debug Page
               </Button>
             </Link>
             <Button
-              onClick={handleSignOut}
               className="w-full"
+              onClick={handleSignOut}
               variant="destructive"
             >
               Sign Out
