@@ -1,6 +1,12 @@
 import { http, HttpResponse } from "msw";
 
-import { AccessTokenResponse, InfoResponse, LoginRequest, RegisterRequest, TwoFactorResponse } from "../api/client";
+import type {
+  AccessTokenResponse,
+  InfoResponse,
+  LoginRequest,
+  RegisterRequest,
+  TwoFactorResponse,
+} from "../api/client";
 
 // Demo user data
 export const users = [

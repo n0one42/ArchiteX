@@ -2,7 +2,8 @@
 
 "use client";
 
-import { TodosVm } from "@/api/client";
+import type { TodosVm } from "@/api/client";
+
 import apiClient from "@/api/fetchInstance";
 import { useAuth } from "@/auth/lib/authContext";
 import { Button } from "@/components/ui/button";

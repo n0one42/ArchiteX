@@ -19,6 +19,19 @@ const baseConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
   {
     rules: {
+      // typescript
+      "@typescript-eslint/consistent-type-imports": "error",
+      "@typescript-eslint/no-empty-object-type": "error",
+      "@typescript-eslint/no-explicit-any": "error",
+      // "@typescript-eslint/no-shadow": "error",
+      "@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],
+      // common
+      "consistent-return": "error",
+      "default-case-last": "error",
+      "func-names": "warn",
+      "no-constant-condition": "error",
+      "no-unused-vars": "error",
+      "no-useless-rename": "error",
       "prefer-arrow-callback": "error",
       "prefer-template": "error",
     },

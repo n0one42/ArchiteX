@@ -1,12 +1,14 @@
 "use client";
 
-import { ApiException, InfoResponse, LoginRequest } from "@/api/client";
+import type { ApiException, InfoResponse, LoginRequest } from "@/api/client";
+
 import { createContext, useContext } from "react";
 
 interface AuthContextType {
   clearError: () => void;
   error: ApiException | null;
   isLoading: boolean;
+  // eslint-disable-next-line no-unused-vars
   login: (request: LoginRequest, options?: { useCookies?: boolean; useSessionCookies?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
   user: InfoResponse | null;

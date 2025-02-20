@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import { WeatherForecast } from "../api/client";
+import type { WeatherForecast } from "../api/client";
 
 // Mock data
 export const demoWeatherForecasts: WeatherForecast[] = [

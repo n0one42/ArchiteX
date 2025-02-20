@@ -2,7 +2,10 @@
 
 "use client";
 
-import { ApiException, LoginRequest } from "@/api/client";
+import type { LoginRequest } from "@/api/client";
+import type { FormEvent } from "react";
+
+import { ApiException } from "@/api/client";
 // import { toast } from "sonner";
 import { useAuth } from "@/auth/lib/authContext";
 import { Button } from "@/components/ui/button";
@@ -12,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 

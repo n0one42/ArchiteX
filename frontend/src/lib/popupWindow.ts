@@ -27,7 +27,8 @@ export class PopupWindow {
     return new Promise((resolve, reject) => {
       const popup = window.open(url, "_blank", this.stringifyFeatures(features));
       if (!popup) {
-        return reject(new Error("Popup blocked or failed to open."));
+        reject(new Error("Popup blocked or failed to open."));
+        return;
       }
       this.popupWindow = popup;
 
