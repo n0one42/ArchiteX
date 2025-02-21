@@ -66,11 +66,23 @@ const boundariesConfig = {
             from: ["shared"],
           },
           {
-            allow: ["shared", ["feature", { featureName: "${from.featureName}" }]],
+            allow: ["shared", "auth", "api", ["feature", { featureName: "${from.featureName}" }]],
             from: ["feature"],
           },
           {
-            allow: ["shared", "feature"],
+            allow: ["api"],
+            from: ["api"],
+          },
+          {
+            allow: ["auth", "shared", "api", ["feature", { featureName: "${from.featureName}" }]],
+            from: ["auth"],
+          },
+          {
+            allow: ["api", "mocks"],
+            from: ["mocks"],
+          },
+          {
+            allow: ["shared", "feature", "auth"],
             from: ["app", "neverImport"],
           },
           {
@@ -86,15 +98,10 @@ const boundariesConfig = {
   settings: {
     "boundaries/elements": [
       {
+        capture: ["api"],
         mode: "full",
-        pattern: ["src/components/**/*", "src/hooks/**/*", "src/lib/**/*"],
-        type: "shared",
-      },
-      {
-        capture: ["featureName"],
-        mode: "full",
-        pattern: ["src/features/*/**/*"],
-        type: "feature",
+        pattern: ["src/api/**/*"],
+        type: "api",
       },
       {
         capture: ["_", "fileName"],
@@ -103,15 +110,34 @@ const boundariesConfig = {
         type: "app",
       },
       {
+        capture: ["auth"],
+        mode: "full",
+        pattern: ["src/auth/**/*"],
+        type: "auth",
+      },
+      {
+        capture: ["featureName"],
+        mode: "full",
+        pattern: ["src/features/*/**/*"],
+        type: "feature",
+      },
+      {
+        capture: ["mocks"],
+        mode: "full",
+        pattern: ["src/mocks/**/*"],
+        type: "mocks",
+      },
+      {
+        mode: "full",
+        pattern: ["src/components/**/*", "src/hooks/**/*", "src/lib/**/*"],
+        type: "shared",
+      },
+      {
         mode: "full",
         pattern: ["src/*", "src/tasks/**/*"],
         type: "neverImport",
       },
-      {
-        mode: "full",
-        pattern: ["auth/lib/**/*"],
-        type: "auth",
-      },
+
       {
         mode: "full",
         pattern: ["**/*.css"],
@@ -131,6 +157,6 @@ const perfectionistConfig = {
     ...perfectionist.configs["recommended-natural"].rules,
   },
 };
-const config = [...baseConfig, perfectionistConfig, prettierIntegration]; // TODO: add boundariesConfig after migration
+const config = [...baseConfig, perfectionistConfig, boundariesConfig, prettierIntegration]; // TODO: add boundariesConfig after migration
 
 export default config;
