@@ -1,3 +1,4 @@
+// frontend/src/auth/lib/authProvider.tsx
 "use client";
 
 import type { InfoResponse, LoginRequest } from "@/api/client";
@@ -20,27 +21,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<InfoResponse | null>(null);
   const router = useRouter();
 
-  // Memoize the API client
-  const client = useMemo(() => apiClient, []);
-
-  // Fetch user info from the API
+  // Fetch user info from the API without memoizing the static apiClient
   const fetchUserInfo = useCallback(async () => {
     try {
-      const userInfo = await client.getApiUsersManageInfo();
+      const userInfo = await apiClient.getApiUsersManageInfo();
       setUser(userInfo);
     } catch (err) {
       console.error("Failed to fetch user info:", err);
       setUser(null);
     }
-  }, [client]);
+  }, []);
 
-  // Login function
+  // Login function calls the login API and then fetches the user info.
   const login = useCallback(
     async (request: LoginRequest, options?: { useCookies?: boolean; useSessionCookies?: boolean }) => {
       setIsLoading(true);
       setError(null);
       try {
-        await client.postApiUsersLogin(request, options?.useCookies, options?.useSessionCookies);
+        await apiClient.postApiUsersLogin(request, options?.useCookies, options?.useSessionCookies);
         await fetchUserInfo();
 
         const params = new URLSearchParams(window.location.search);
@@ -57,10 +55,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false);
       }
     },
-    [client, fetchUserInfo, router]
+    [fetchUserInfo, router]
   );
 
-  // Logout function
+  // Logout clears the user state and redirects to sign-out
   const logout = useCallback(async () => {
     setIsLoading(true);
     try {
@@ -77,6 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setError(null);
   }, []);
 
+  // On mount, fetch user info if not on public routes
   useEffect(() => {
     const path = window.location.pathname;
     if (path !== "/" && !path.startsWith(paths.auth.signIn) && !path.startsWith(paths.auth.signOut)) {
@@ -84,6 +83,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [fetchUserInfo]);
 
+  // Listen for "unauthorized" events to clear the user and redirect.
   useEffect(() => {
     const handleUnauthorized = () => {
       setUser(null);
@@ -97,9 +97,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [router]);
 
+  // Derive a memoized user object. Here, we add an isAuthenticated flag.
+  const memoizedUser = useMemo(() => {
+    return user ? { ...user, isAuthenticated: true } : null;
+  }, [user]);
+
+  // Memoize the context value to avoid unnecessary re-renders.
   const contextValue = useMemo(
-    () => ({ clearError, error, isLoading, login, logout, user }),
-    [clearError, error, isLoading, login, logout, user]
+    () => ({
+      clearError,
+      error,
+      isLoading,
+      login,
+      logout,
+      user: memoizedUser,
+    }),
+    [clearError, error, isLoading, login, logout, memoizedUser]
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

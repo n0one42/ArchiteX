@@ -65,7 +65,7 @@ const boundariesConfig = {
           },
           {
             allow: ["routes", "auth"],
-            from: ["routes", "auth", "feature"],
+            from: ["routes", "auth", "feature", "middleware"],
           },
           {
             allow: ["shared", "auth", "api", ["feature", { featureName: "${from.featureName}" }]],
@@ -135,6 +135,12 @@ const boundariesConfig = {
         mode: "full",
         pattern: ["src/routes/**/*"],
         type: "routes",
+      },
+      {
+        capture: ["middleware"],
+        mode: "full",
+        pattern: ["src/middleware.ts"],
+        type: "middleware",
       },
       {
         mode: "full",

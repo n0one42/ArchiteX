@@ -1,10 +1,18 @@
 // src/middleware.ts
 import type { NextRequest } from "next/server";
 
+import { paths } from "@/routes/paths";
 import { NextResponse } from "next/server";
 
-const AUTH_COOKIE_NAME = "AspNetCoreIdentityApplication";
-const COOKIE_DOMAIN = ".mydom.com";
+if (!process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME) {
+  throw new Error("NEXT_PUBLIC_AUTH_COOKIE_NAME must be defined");
+}
+
+if (!process.env.NEXT_PUBLIC_COOKIE_DOMAIN) {
+  throw new Error("NEXT_PUBLIC_COOKIE_DOMAIN must be defined");
+}
+
+const AUTH_COOKIE_NAME = process.env.NEXT_PUBLIC_AUTH_COOKIE_NAME;
 
 export function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -12,19 +20,19 @@ export function middleware(request: NextRequest) {
   const isAuthenticated = Boolean(authCookie);
 
   // Always allow access to root and static files.
-  const isPublicPath = pathname === "/" || pathname.startsWith("/_next");
+  const isPublicPath = pathname === paths.root || pathname.startsWith("/_next");
   // Also allow unauthenticated access to the sign-in page.
-  if (isPublicPath || (!isAuthenticated && pathname === "/sign-in")) {
+  if (isPublicPath || (!isAuthenticated && pathname === paths.auth.signIn)) {
     return NextResponse.next();
   }
 
   // Handle sign-out: clear the auth cookie and redirect to home.
-  if (pathname === "/sign-out") {
-    const response = NextResponse.redirect(new URL("/", request.url));
+  if (pathname === paths.auth.signOut) {
+    const response = NextResponse.redirect(new URL(paths.root, request.url));
     response.cookies.set(AUTH_COOKIE_NAME, "", {
-      domain: COOKIE_DOMAIN,
+      domain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN,
       expires: new Date(0),
-      path: "/",
+      path: paths.root,
     });
     return response;
   }
@@ -33,16 +41,16 @@ export function middleware(request: NextRequest) {
   // redirect to the sign-in page with the current path and query string.
   if (!isAuthenticated) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/sign-in";
+    redirectUrl.pathname = paths.auth.signIn;
     redirectUrl.searchParams.set("redirect", pathname + search);
     return NextResponse.redirect(redirectUrl);
   }
 
   // If authenticated and trying to access the sign-in page,
   // redirect to a default authenticated route.
-  if (pathname === "/sign-in") {
+  if (pathname === paths.auth.signIn) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/testing/test1";
+    redirectUrl.pathname = paths.testing.test1;
     return NextResponse.redirect(redirectUrl);
   }
 
