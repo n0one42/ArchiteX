@@ -26,8 +26,8 @@ type SidebarContext = {
   isMobile: boolean;
   open: boolean;
   openMobile: boolean;
-  setOpen: (open: boolean) => void; // eslint-disable-line no-unused-vars
-  setOpenMobile: (open: boolean) => void; // eslint-disable-line no-unused-vars
+  setOpen: (open: boolean) => void;
+  setOpenMobile: (open: boolean) => void;
   state: "collapsed" | "expanded";
   toggleSidebar: () => void;
 };
@@ -47,7 +47,7 @@ const SidebarProvider = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     defaultOpen?: boolean;
-    onOpenChange?: (open: boolean) => void; // eslint-disable-line no-unused-vars
+    onOpenChange?: (open: boolean) => void;
     open?: boolean;
   }
 >(({ children, className, defaultOpen = true, onOpenChange: setOpenProp, open: openProp, style, ...props }, ref) => {
@@ -59,7 +59,6 @@ const SidebarProvider = React.forwardRef<
   const [_open, _setOpen] = React.useState(defaultOpen);
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
-    // eslint-disable-next-line no-unused-vars
     (value: ((value: boolean) => boolean) | boolean) => {
       const openState = typeof value === "function" ? value(open) : value;
       if (setOpenProp) {
@@ -381,7 +380,7 @@ const SidebarGroupLabel = React.forwardRef<HTMLDivElement, React.ComponentProps<
     return (
       <Comp
         className={cn(
-          "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
+          "flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 outline-none ring-sidebar-ring transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0",
           "group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:opacity-0",
           className
         )}

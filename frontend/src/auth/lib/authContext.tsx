@@ -8,7 +8,7 @@ interface AuthContextType {
   clearError: () => void;
   error: ApiException | null;
   isLoading: boolean;
-  // eslint-disable-next-line no-unused-vars
+
   login: (request: LoginRequest, options?: { useCookies?: boolean; useSessionCookies?: boolean }) => Promise<void>;
   logout: () => Promise<void>;
   user: InfoResponse | null;

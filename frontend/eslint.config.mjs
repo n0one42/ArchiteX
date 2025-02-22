@@ -24,13 +24,12 @@ const baseConfig = [
       "@typescript-eslint/no-empty-object-type": "error",
       "@typescript-eslint/no-explicit-any": "error",
       // "@typescript-eslint/no-shadow": "error",
-      "@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],
+      "@typescript-eslint/no-unused-vars": ["error", { args: "none" }],
       // common
       "consistent-return": "error",
       "default-case-last": "error",
       "func-names": "warn",
       "no-constant-condition": "error",
-      "no-unused-vars": "error",
       "no-useless-rename": "error",
       "prefer-arrow-callback": "error",
       "prefer-template": "error",
@@ -54,8 +53,7 @@ const boundariesConfig = {
     boundaries,
   },
   rules: {
-    ...perfectionist.configs["recommended-natural"].rules,
-    // ...boundaries.configs.recommended.rules, // TODO: Uncomment at the end of the migration
+    ...boundaries.configs.recommended.rules,
     "boundaries/element-types": [
       "error",
       {
@@ -96,6 +94,7 @@ const boundariesConfig = {
         ],
       },
     ],
+    "boundaries/no-private": "off",
     "boundaries/no-unknown": "warn",
     "boundaries/no-unknown-files": "warn",
   },
@@ -154,7 +153,6 @@ const boundariesConfig = {
         type: "css",
       },
     ],
-    // "boundaries/include": ["src/**/*", "!src/mocks/**/*"],
     "boundaries/include": ["src/**/*"],
   },
 };
@@ -167,6 +165,6 @@ const perfectionistConfig = {
     ...perfectionist.configs["recommended-natural"].rules,
   },
 };
-const config = [...baseConfig, perfectionistConfig, boundariesConfig, prettierIntegration]; // TODO: add boundariesConfig after migration
+const config = [...baseConfig, perfectionistConfig, boundariesConfig, prettierIntegration];
 
 export default config;
