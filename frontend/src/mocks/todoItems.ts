@@ -1,11 +1,11 @@
-import { http, HttpResponse } from "msw";
-
 import type {
   CreateTodoItemCommand,
   PaginatedListOfTodoItemBriefDto,
   TodoItemBriefDto,
   UpdateTodoItemCommand,
-} from "../api/client";
+} from "@/api/client";
+
+import { http, HttpResponse } from "msw";
 
 // Mock data
 export const demoTodoItems: TodoItemBriefDto[] = [

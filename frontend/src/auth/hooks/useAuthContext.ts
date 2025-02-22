@@ -1,8 +1,7 @@
 "use client";
 
+import { AuthContext } from "@/auth/lib/authContext";
 import { useContext } from "react";
-
-import { AuthContext } from "../lib/authContext";
 
 // ----------------------------------------------------------------------
 

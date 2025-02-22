@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { paths } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
@@ -161,7 +162,7 @@ export default function RegisterForm() {
             Already have an account?{" "}
             <Link
               className="underline"
-              href="/sign-in"
+              href={paths.auth.signIn}
             >
               Login
             </Link>

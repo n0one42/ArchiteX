@@ -1,8 +1,7 @@
+import type { CreateTodoListCommand, LookupDto, TodoListDto, TodosVm, UpdateTodoListCommand } from "@/api/client";
+
+import { PriorityLevel } from "@/api/client";
 import { http, HttpResponse } from "msw";
-
-import type { CreateTodoListCommand, LookupDto, TodoListDto, TodosVm, UpdateTodoListCommand } from "../api/client";
-
-import { PriorityLevel } from "../api/client";
 
 // Mock data
 export const demoTodoLists: TodoListDto[] = [

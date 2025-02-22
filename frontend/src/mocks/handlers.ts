@@ -1,7 +1,7 @@
-import { todoItemHandlers } from "./todoItems";
-import { todoListHandlers } from "./todoLists";
-import { userHandlers } from "./users";
-import { weatherForecastHandlers } from "./weatherForecasts";
+import { todoItemHandlers } from "@/mocks/todoItems";
+import { todoListHandlers } from "@/mocks/todoLists";
+import { userHandlers } from "@/mocks/users";
+import { weatherForecastHandlers } from "@/mocks/weatherForecasts";
 
 export const handlers = [
   ...userHandlers,

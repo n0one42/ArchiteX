@@ -13,8 +13,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import { paths } from "@/routes/paths";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -41,6 +43,7 @@ type LoginFormValues = z.infer<typeof formSchema>;
 export default function LoginForm() {
   const { clearError, error, isLoading, login } = useAuth();
   const [errorState, setError] = useState<ApiException | null>(null);
+  const router = useRouter();
   const form = useForm<LoginFormValues>({
     defaultValues: {
       email: "",
@@ -123,7 +126,7 @@ export default function LoginForm() {
                         <FormLabel htmlFor="password">Password</FormLabel>
                         <Link
                           className="ml-auto inline-block text-sm underline"
-                          href="#"
+                          href={paths.auth.forgotPassword}
                         >
                           Forgot your password?
                         </Link>
@@ -159,7 +162,7 @@ export default function LoginForm() {
                   </Button>
                   <Button
                     className="w-full"
-                    onClick={() => (window.location.href = "/debug")}
+                    onClick={() => router.push(paths.debug.root)}
                     type="button"
                     variant="ghost"
                   >
@@ -173,7 +176,7 @@ export default function LoginForm() {
             Don&apos;t have an account?{" "}
             <Link
               className="underline"
-              href="/sign-up"
+              href={paths.auth.signUp}
             >
               Sign up
             </Link>

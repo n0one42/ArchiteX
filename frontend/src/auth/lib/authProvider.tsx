@@ -5,10 +5,10 @@ import type { ReactNode } from "react";
 
 import { ApiException } from "@/api/client";
 import apiClient from "@/api/fetchInstance";
+import { AuthContext } from "@/auth/lib/authContext";
+import { paths } from "@/routes/paths";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-
-import { AuthContext } from "./authContext";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -44,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         await fetchUserInfo();
 
         const params = new URLSearchParams(window.location.search);
-        const redirectUrl = params.get("redirect") || "/";
+        const redirectUrl = params.get("redirect") || paths.root;
         router.push(redirectUrl);
       } catch (err: unknown) {
         if (ApiException.isApiException(err)) {
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
     try {
       setUser(null);
-      router.push("/sign-out");
+      router.push(paths.auth.signOut);
     } catch (err) {
       console.error("Logout failed:", err);
     } finally {
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const path = window.location.pathname;
-    if (path !== "/" && !path.startsWith("/sign-in") && !path.startsWith("/sign-out")) {
+    if (path !== "/" && !path.startsWith(paths.auth.signIn) && !path.startsWith(paths.auth.signOut)) {
       fetchUserInfo();
     }
   }, [fetchUserInfo]);
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const handleUnauthorized = () => {
       setUser(null);
       const redirectUrl = window.location.pathname + window.location.search;
-      router.push(`/sign-in?redirect=${encodeURIComponent(redirectUrl)}`);
+      router.push(`${paths.auth.signIn}?redirect=${encodeURIComponent(redirectUrl)}`);
     };
 
     window.addEventListener("auth:unauthorized", handleUnauthorized);

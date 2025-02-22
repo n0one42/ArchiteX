@@ -66,8 +66,8 @@ const boundariesConfig = {
             from: ["shared"],
           },
           {
-            allow: ["routes"],
-            from: ["routes"],
+            allow: ["routes", "auth"],
+            from: ["routes", "auth", "feature"],
           },
           {
             allow: ["shared", "auth", "api", ["feature", { featureName: "${from.featureName}" }]],

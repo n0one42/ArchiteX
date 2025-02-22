@@ -3,11 +3,8 @@ export const paths = {
     forgotPassword: "/forgot-password",
     resetPassword: "/reset-password",
     signIn: "/sign-in",
+    signOut: "/sign-out",
     signUp: "/sign-up",
-  },
-  dashboard: {
-    root: "/dashboard",
-    settings: "/dashboard/settings",
   },
   debug: {
     root: "/debug",
@@ -15,5 +12,7 @@ export const paths = {
   root: "/",
   testing: {
     root: "/testing",
+    test1: "/testing/test1",
+    test2: "/testing/test2",
   },
 };
