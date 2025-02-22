@@ -1,0 +1,115 @@
+---
+description: Rule for generating new use cases (commands, queries, and events) in the CleanArchitecture backend. This rule inspects the folder structure to verify consistency, enforces naming conventions (including proper singular/plural usage), and only executes database migrations and related updates after confirming that the folder structure is correct. In the case of demo data use cases, domain entities and EF migrations are skipped.
+globs: backend/src/**/*,src/**/*
+---
+# CleanArchitecture Full Use Case Generation Rule
+
+This rule assists in generating new use cases (commands or queries) in the CleanArchitecture backend project.
+You are the best senior developer in the world! It is like you would have created this project!
+
+## 1. Pre-Execution: Inspecting the Folder Structure
+
+Before creating any new use case, **always execute** the following command to get an overview of the current C# solution structure:
+`tree -L 10 -P ‘.cs|.sln’ -I ‘node_modules|dist|build|coverage|logs|temp|cache|backup|debug|.git|pycache|*.pyc|.DS_Store|.pytest_cache|.vscode|bin|obj|.next|docs’ $( [ “$(basename “$PWD”)” = “backend” ] && echo “src” || echo “backend/src” )`
+
+This command identifies the current layout and locates the Application layer:
+- **From the repository root:** `backend/src/Application/`
+- **From the backend folder:** `src/Application/`
+
+## 2. Understanding the Application Layer Structure
+
+The Application layer contains feature folders using plural names (e.g., `TodoItems`, `TodoLists`, `Inspections`).
+
+Within each feature folder, there are subfolders:
+- **Commands:** For use cases starting with `Create`, `Update`, `Delete`, or `Purge`.  
+  *Note:* When the use case deals with multiple items (e.g., deleting several items), the folder name should use the plural form (e.g., `DeleteTodoItems`).
+- **Queries:** For use cases starting with `Get`.  
+  *Example:* `GetTodoItems` vs. `GetTodoItem` should reflect whether the query returns multiple items.
+- **EventHandlers:** (Optional) For handling events—if events are involved, corresponding domain events must be handled separately.
+
+- **READ** Before you start, read the components inside src/Application/ to get an overview on how they were created!
+
+### Example Structure:
+```tree
+src/Application/TodoItems/
+├── Commands/
+│   ├── CreateTodoItem/
+│   │   ├── CreateTodoItem.cs         <– Main file (same name as folder)
+│   │   └── CreateTodoItemCommandValidator.cs  <– Validator (if needed)
+│   ├── DeleteTodoItem/                <– For single item deletion
+│   │   └── DeleteTodoItem.cs
+│   ├── DeleteTodoItems/               <– For deletion of multiple items
+│   │   └── DeleteTodoItems.cs
+│   ├── UpdateTodoItem/
+│   │   ├── UpdateTodoItem.cs
+│   │   └── UpdateTodoItemCommandValidator.cs
+│   └── PurgeTodoLists/               <– Example with plural if needed
+│       └── PurgeTodoLists.cs
+├── EventHandlers/ (if applicable)
+│   ├── TodoItemCreatedEventHandler.cs
+│   └── TodoItemCompletedEventHandler.cs
+└── Queries/
+    └── GetTodoItemsWithPagination/
+        ├── GetTodoItemsWithPagination.cs
+        ├── GetTodoItemsWithPaginationQueryValidator.cs
+        ├── TodoItemBriefDto.cs
+        └── GetTodoItemsWithPaginationDemo.cs  # Included only if demo data is requested
+```
+
+## 3. Naming Conventions & File Creation
+
+- **Commands:**  
+  - Folder names must begin with `Create`, `Update`, `Delete`, or `Purge`.  
+  - If the operation affects multiple items, the folder name should be plural (e.g., `DeleteTodoItems`).
+  - The main file inside each command folder must have the same name as the folder.
+  - Include a validator file (suffix: `CommandValidator`) if needed.
+
+- **Queries:**  
+  - Folder names must begin with `Get` and should reflect whether the query returns one item or multiple items.
+  - The main file inside each query folder must mirror the folder name.
+  - Include any necessary validator files (suffix: `QueryValidator`), DTOs, or VM files.
+
+- **Demo Data Exception:**  
+  - **When creating use cases with demo data, no changes to domain entities are made.**
+  - A demo file (e.g., `GetInspectionsDemo.cs`) should be created in the same folder, and **all domain/entity updates, EF migrations, and context modifications must be skipped.**
+
+## 4. Entity & Domain Updates
+
+If **demo data is not specified**, then perform these steps **only after** verifying the folder structure is correct:
+- **Domain Entities:**  
+  - Create or update entity files in `src/Domain/Entities/`.
+  - If events are involved, create/update the corresponding event files in `src/Domain/Events/`.
+- **Context Updates:**  
+  - Modify `IApplicationDbContext.cs` and `ApplicationDbContext.cs` as needed.
+
+## 5. EF Migrations & Database Update
+
+**Only execute these steps after the folder structure and file creation have been verified:**
+
+- Run the following EF Core commands:
+`dotnet ef migrations add “PurposeOfFeatureMigration” –project src/Infrastructure –startup-project src/Web –output-dir Data\Migrations`
+`dotnet ef database update –project src/Infrastructure –startup-project src/Web`
+
+*Note:* These commands are skipped if the use case is created with demo data.
+
+## 6. Endpoint Updates
+
+After verifying file creation and (if applicable) domain updates:
+- Update or create a new endpoint file in:
+`backend/src/Web/Endpoints/{FeatureName}.cs`
+
+- This file should register the new use case and be organized under the corresponding feature.
+- Also Update the `backend/src/Web/Web.http` with the new feature.
+
+## 7. Final Verification
+
+Before finalizing, the agent must:
+- **Verify** that all new files are created in the correct subfolders.
+- **Cross-check** the naming conventions and folder structure against existing examples.
+- **Confirm** that the folder structure and file integrity are correct.
+- **Only if everything is verified** and if demo data is not specified, then execute EF migrations and update the database as described above.
+
+# IMPORTANT
+- **Please provide me with a roadmap outlining your planned actions and ask for my approval to proceed.**
+- **Don’t make assumptions. If something is unclear, please ask for clarification before you begin.**
+- **Repeat the most important instructions to ensure understanding.**

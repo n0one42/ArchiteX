@@ -66,6 +66,10 @@ const boundariesConfig = {
             from: ["shared"],
           },
           {
+            allow: ["routes"],
+            from: ["routes"],
+          },
+          {
             allow: ["shared", "auth", "api", ["feature", { featureName: "${from.featureName}" }]],
             from: ["feature"],
           },
@@ -126,6 +130,12 @@ const boundariesConfig = {
         mode: "full",
         pattern: ["src/mocks/**/*"],
         type: "mocks",
+      },
+      {
+        capture: ["routes"],
+        mode: "full",
+        pattern: ["src/routes/**/*"],
+        type: "routes",
       },
       {
         mode: "full",

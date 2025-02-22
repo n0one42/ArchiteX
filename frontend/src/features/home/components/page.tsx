@@ -15,48 +15,83 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-[50vh] w-full items-center justify-center px-4">
-      <Card className="mx-auto max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Welcome!</CardTitle>
-          {user?.email && <p className="text-sm text-muted-foreground">Logged in as: {user.email}</p>}
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col gap-4">
-            <Button
-              className="w-full"
-              onClick={() => {
-                toast.success("This is a success toast!");
-                toast.error("This is an error toast!");
-                toast.info("This is an info toast!");
-                toast.warning("This is a warning toast!");
-              }}
-              variant="outline"
-            >
-              Test Toasts
-            </Button>
-            <Link
-              className="w-full"
-              href="/debug"
-            >
-              <Button
-                className="w-full"
-                type="button"
-                variant="outline"
-              >
-                Debug Page
-              </Button>
-            </Link>
-            <Button
-              className="w-full"
-              onClick={handleSignOut}
-              variant="destructive"
-            >
-              Sign Out
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="container mx-auto px-4 py-12">
+      <div className="mb-12 text-center">
+        <h1 className="mb-4 text-4xl font-bold">TechCorp Solutions</h1>
+        <p className="text-xl text-muted-foreground">Innovating for a better tomorrow</p>
+      </div>
+
+      <div className="grid gap-8 md:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>Digital Transformation</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              We help businesses modernize their operations through cutting-edge technology solutions.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Cloud Solutions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Secure and scalable cloud infrastructure to power your business growth.
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Custom Software</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground">
+              Tailored software solutions designed to meet your unique business needs.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-12 flex justify-center">
+        {user ? (
+          <Card className="w-full max-w-sm">
+            <CardHeader>
+              <CardTitle className="text-2xl">Welcome Back!</CardTitle>
+              <p className="text-sm text-muted-foreground">Logged in as: {user.email}</p>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-4">
+                <Link
+                  className="w-full"
+                  href="/testing/test1"
+                >
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                  >
+                    Go to Dashboard
+                  </Button>
+                </Link>
+                <Button
+                  className="w-full"
+                  onClick={handleSignOut}
+                  variant="destructive"
+                >
+                  Sign Out
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Link href="/sign-in">
+            <Button size="lg">Sign In to Dashboard</Button>
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
