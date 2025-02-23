@@ -57,3 +57,13 @@ npx shadcn@latest init
 ## Notes
 
 https://www.shadcn-form.com/playground
+
+sudo docker run -d -p 3342:3342 --name architex-frontend \
+ --network traefik_net \
+ --label 'traefik.enable=true' \
+ --label 'traefik.http.routers.architex-frontend-rtr.entrypoints=websecure' \
+ --label 'traefik.http.routers.architex-frontend-rtr.rule=Host(`architex-frontend.mydom.com`)' \
+ --label 'traefik.http.routers.architex-frontend-rtr.middlewares=chain-no-auth@file' \
+ --label 'traefik.http.routers.architex-frontend-rtr.service=architex-frontend-svc' \
+ --label 'traefik.http.services.architex-frontend-svc.loadbalancer.server.port=3342' \
+ architex-frontend:0.1.0-amd64
