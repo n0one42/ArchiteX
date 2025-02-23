@@ -40,6 +40,23 @@
         "uriFormat": "%s",
         "webRoot": "${workspaceFolder}"
       }
+    },
+    {
+      "name": ".NET Core: Debug Web API",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/backend/src/Web/bin/Debug/net9.0/backend.Web.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/backend/src/Web",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   ]
 }
