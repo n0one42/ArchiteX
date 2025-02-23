@@ -1,6 +1,12 @@
 # =========================
 # Stage 1: Build stage
 # =========================
+# Platform can be overridden during build with --build-arg PLATFORM=<platform>
+# Common platforms:
+# - MacOS M1/M2/M3 (Apple Silicon): linux/arm64
+# - Intel/AMD processors: linux/amd64
+# - Raspberry Pi: linux/arm/v7 (32-bit) or linux/arm64 (64-bit)
+ARG PLATFORM
 FROM node:23-alpine AS builder
 # Set working directory
 WORKDIR /app
