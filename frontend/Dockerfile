@@ -1,31 +1,59 @@
-# Build stage
+# =========================
+# Stage 1: Build stage
+# =========================
 FROM node:23-alpine AS builder
+# Set working directory
 WORKDIR /app
+
+# Copy package files first to leverage caching
 COPY package*.json ./
 COPY pnpm-lock.yaml ./
-RUN npm install -g pnpm
-RUN pnpm install
+
+# Install a pinned version of pnpm (for reproducibility)
+RUN npm install -g pnpm@10.3.0
+
+# Install dependencies using a frozen lockfile to ensure reproducible installs.
+# The --frozen-lockfile flag tells pnpm to only use the exact versions in pnpm-lock.yaml.
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the application code
 COPY . .
+
+# Build the Next.js application
 RUN pnpm run build
 
-# Production stage
+# =========================
+# Stage 2: Production stage
+# =========================
 FROM node:23-alpine AS runner
 WORKDIR /app
 
+# Set NODE_ENV to production
 ENV NODE_ENV=production
 
-RUN addgroup --system --gid 1242 nodejs
-RUN adduser --system --uid 1242 nextjs
+# Build arguments for user configuration with defaults
+ARG USER_ID=1242
+ARG GROUP_ID=1242
+ARG USER_NAME=nextjs
 
+# Create a non-root user and group based on provided build arguments
+RUN addgroup --system --gid ${GROUP_ID} ${USER_NAME} && \
+    adduser --system --uid ${USER_ID} -G ${USER_NAME} ${USER_NAME}
+
+# Copy necessary assets from the build stage
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-USER nextjs
+# Switch to the non-root user for improved security
+USER ${USER_ID}
 
-EXPOSE 3342
+# Set default environment variables for runtime configuration
+ENV PORT=3342 \
+    HOSTNAME="0.0.0.0"
 
-ENV PORT=3342
-ENV HOSTNAME="0.0.0.0"
+# Expose the application port
+EXPOSE ${PORT}
 
+# Start the Next.js server
 CMD ["node", "server.js"]

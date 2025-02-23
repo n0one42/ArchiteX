@@ -55,12 +55,18 @@ public static class DependencyInjection
         // Register cookie authentication with the scheme "Identity.Application"
         .AddCookie(IdentityConstants.ApplicationScheme, options =>
         {
-            options.Cookie.Name = "AspNetCoreIdentityApplication";   // Name can be changed if wanted
+            var cookieName = builder.Configuration["Authentication:Cookie:Name"];
+            var cookieDomain = builder.Configuration["Authentication:Cookie:Domain"];
+
+            Guard.Against.NullOrEmpty(cookieName, message: "Cookie Name must be configured in appsettings.json under Authentication:Cookie:Name");
+            Guard.Against.NullOrEmpty(cookieDomain, message: "Cookie Domain must be configured in appsettings.json under Authentication:Cookie:Domain");
+
+            options.Cookie.Name = cookieName;
             options.Cookie.HttpOnly = true;
             options.ExpireTimeSpan = TimeSpan.FromDays(7);              // Set the cookie to expire after 7 days of inactivity.
             options.SlidingExpiration = true;
 
-            options.Cookie.Domain = "mydom.com";                        // !IMPORTANT! otherwise the middleware.ts in nextjs does not intercept the cookies
+            options.Cookie.Domain = cookieDomain;
             // You can not use SameSiteMode.None without https! To make your life easier, always use https and a domain even through /etc/hosts if using cookies
             options.Cookie.SameSite = SameSiteMode.Strict;              // Mitigate CSRF attacks (SameSiteMode.Lax for balance and SameSiteMode.Strict for max security) Test it!
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;    // Require HTTPS in production

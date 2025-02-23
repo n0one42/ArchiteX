@@ -1,7 +1,12 @@
 {
-  "name": "frontend_new",
+  "name": "architex-frontend",
+  "author": "n0one42",
+  "description": "Architex Frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=21.0.0"
+  },
   "scripts": {
     "postinstall": "npx next telemetry --disable",
     "frontend:dev": "pnpm -C frontend run dev",
@@ -13,7 +18,9 @@
     "lint:check": "next lint",
     "lint:fix": "next lint --fix",
     "prettier:check": "prettier --check src",
-    "prettier:fix": "prettier --write src"
+    "prettier:fix": "prettier --write src",
+    "docker:build": "docker build -t $npm_package_name:$npm_package_version .",
+    "docker:run": "docker run -d -p 3342:3342 --name $npm_package_name $npm_package_name:$npm_package_version"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.0.0",
