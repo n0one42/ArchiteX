@@ -19,8 +19,8 @@
     "lint:fix": "next lint --fix",
     "prettier:check": "prettier --check src",
     "prettier:fix": "prettier --write src",
-    "docker:build": "docker build -t $npm_package_name:$npm_package_version .",
-    "docker:run": "docker run -d -p 3342:3342 --name $npm_package_name $npm_package_name:$npm_package_version"
+    "docker:build": "docker build -t $npm_package_name:$npm_package_version-$(uname -m) .",
+    "docker:run": "docker run -d -p 3342:3342 --name $npm_package_name $npm_package_name:$npm_package_version-$(uname -m)"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.0.0",

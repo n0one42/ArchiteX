@@ -6,8 +6,9 @@
 # - MacOS M1/M2/M3 (Apple Silicon): linux/arm64
 # - Intel/AMD processors: linux/amd64
 # - Raspberry Pi: linux/arm/v7 (32-bit) or linux/arm64 (64-bit)
+# If no platform is specified, it will automatically use your system's architecture
 ARG PLATFORM
-FROM node:23-alpine AS builder
+FROM --platform=${PLATFORM:-$BUILDPLATFORM} node:23-alpine AS builder
 # Set working directory
 WORKDIR /app
 
@@ -31,7 +32,7 @@ RUN pnpm run build
 # =========================
 # Stage 2: Production stage
 # =========================
-FROM node:23-alpine AS runner
+FROM --platform=${PLATFORM:-$BUILDPLATFORM} node:23-alpine AS runner
 WORKDIR /app
 
 # Set NODE_ENV to production
