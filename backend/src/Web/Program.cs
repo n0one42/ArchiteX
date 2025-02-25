@@ -31,7 +31,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("ProdCorsPolicy", policy =>
     {
-        policy.WithOrigins("https://architex-frontend-local.mydom.com", "https://architex-frontend.mydom.com")    // ! Replcae with yours
+        policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [""])
               .AllowCredentials()
               .AllowAnyHeader()
               .AllowAnyMethod();
