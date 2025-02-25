@@ -796,7 +796,9 @@
         },
         "security": [
           {
-            "JWT": []
+            "JWT": [
+              "Administrator"
+            ]
           }
         ]
       }
