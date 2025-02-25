@@ -2,10 +2,10 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <AspireVersion>9.0.0</AspireVersion>
-    <AspnetVersion>9.0.0</AspnetVersion>
-    <EfcoreVersion>9.0.0</EfcoreVersion>
-    <MicrosoftExtensionsVersion>9.0.0</MicrosoftExtensionsVersion>
+    <AspireVersion>9.0.2</AspireVersion>
+    <AspnetVersion>9.0.2</AspnetVersion>
+    <EfcoreVersion>9.0.2</EfcoreVersion>
+    <MicrosoftExtensionsVersion>9.0.2</MicrosoftExtensionsVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Ardalis.GuardClauses" Version="4.6.0" />
@@ -40,6 +40,6 @@
     <PackageVersion Include="NUnit.Analyzers" Version="3.10.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageVersion Include="Respawn" Version="6.2.1" />
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="9.0.0" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="9.0.2" />
   </ItemGroup>
 </Project>

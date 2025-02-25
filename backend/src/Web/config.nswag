@@ -36,7 +36,7 @@
       "serviceSchemes": [],
       "infoTitle": "backend API",
       "infoDescription": null,
-      "infoVersion": "1.0.0",
+      "infoVersion": "0.1.0",
       "documentTemplate": null,
       "documentProcessorTypes": [],
       "operationProcessorTypes": [],
