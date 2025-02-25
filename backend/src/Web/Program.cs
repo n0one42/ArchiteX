@@ -1,4 +1,5 @@
 using backend.Infrastructure.Data;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +13,12 @@ builder.Services.AddCors(options =>
     policy =>
     {
         // IMPORTANT: When using credentials (cookies) you must specify the SetIsOriginAllowed or WithOrigins explicitly.
-#if DEBUG
         policy.SetIsOriginAllowed(origin => true); // Allow any origin
-#else
-        policy.WithOrigins("http://localhost:5142");   // Replace "http://localhost:3000" with your Next.js app URL as needed.
-#endif
+                                                   //#if DEBUG
+                                                   //        policy.SetIsOriginAllowed(origin => true); // Allow any origin
+                                                   //#else
+                                                   //        policy.WithOrigins("http://localhost:5142");   // Replace "http://localhost:3000" with your Next.js app URL as needed.
+                                                   //#endif
         policy.AllowCredentials() // Allow credentials
               .AllowAnyHeader()
               .AllowAnyMethod();
@@ -33,6 +35,13 @@ builder.AddWebServices();
 
 var app = builder.Build();
 
+// This allows the app to interpret the original scheme (HTTPS) from Traefik's forwarded headers.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto
+    // Optionally configure KnownProxies/KnownNetworks if needed
+});
+
 // Configure the HTTP request pipeline.
 #if DEBUG
 app.UseCors("DevCorsPolicy");
@@ -43,12 +52,12 @@ app.UseCors("DevCorsPolicy");
 //    Secure = CookieSecurePolicy.Always,
 //});
 app.UseExceptionHandler("/Error");
-await app.InitialiseDatabaseAsync();
 #else
 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 app.UseHsts();
 app.UseHttpsRedirection();
 #endif
+await app.InitialiseDatabaseAsync();
 
 // Essential for cookie authentication
 app.UseAuthentication();

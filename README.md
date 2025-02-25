@@ -46,6 +46,36 @@ fnm install 23
 fnm default 23 # or fnm use 23
 ```
 
+### Local Development Environment Configuration
+
+#### Host File Configuration
+
+To facilitate local development and testing, please add the following entries to your host file. This configuration allows seamless interaction between your local frontend and the Docker-containerized API through a proxy, all within your local network.
+
+Edit your host file using the following command:
+
+`sudo nano /etc/hosts`
+
+```hosts
+127.0.0.1 architex-frontend-local.mydom.com
+127.0.0.1 architex-backend-local.mydom.com
+{docker-server.local.ip} architex-frontend.mydom.com
+{docker-server.local.ip} architex-backend.mydom.com
+```
+
+Replace `{docker-server.local.ip}` with the actual IP address of your Docker server on the local network.
+
+#### Benefits
+
+This configuration offers several advantages:
+
+1. Local Frontend and API Interaction: Enables testing of your local frontend with the internal Docker container API.
+2. Proxy Setup: Utilizes a proxy setup for enhanced security and performance.
+3. Local Network Traffic: Keeps all traffic within the local network.
+4. Production-Like Environment: Ensures proper functionality, including cookie handling, in a production-like environment.
+
+By implementing this setup, you can confidently develop and test your application, simulating real-world conditions without exposing your development environment to external networks.
+
 ### From within root directory
 
 ```bash
