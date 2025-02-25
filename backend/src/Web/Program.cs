@@ -23,8 +23,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("DevCorsPolicy",
     policy =>
     {
-        policy.SetIsOriginAllowed(origin => true);
-        policy.AllowCredentials()
+        policy.SetIsOriginAllowed(origin => true)
+              .AllowCredentials()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
