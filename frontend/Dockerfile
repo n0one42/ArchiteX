@@ -7,8 +7,10 @@
 # - Intel/AMD processors: linux/amd64
 # - Raspberry Pi: linux/arm/v7 (32-bit) or linux/arm64 (64-bit)
 # If no platform is specified, it will automatically use your system's architecture
+# ? I had problems with node:23-alpine when building for other platforms like linux/amd64, so I downgraded to node:22-alpine
+# ? Maybe switching to ubuntu as base image in the future to mittigate problems with different platforms
 ARG PLATFORM
-FROM --platform=${PLATFORM:-$BUILDPLATFORM} node:23-alpine AS builder
+FROM --platform=${PLATFORM:-$BUILDPLATFORM} node:22-alpine AS builder
 # Set working directory
 WORKDIR /app
 
@@ -17,7 +19,7 @@ COPY package*.json ./
 COPY pnpm-lock.yaml ./
 
 # Install a pinned version of pnpm (for reproducibility)
-RUN npm install -g pnpm@10.3.0
+RUN npm install -g pnpm@10.6.1
 
 # Install dependencies using a frozen lockfile to ensure reproducible installs.
 # The --frozen-lockfile flag tells pnpm to only use the exact versions in pnpm-lock.yaml.
@@ -32,7 +34,7 @@ RUN pnpm run build
 # =========================
 # Stage 2: Production stage
 # =========================
-FROM --platform=${PLATFORM:-$BUILDPLATFORM} node:23-alpine AS runner
+FROM --platform=${PLATFORM:-$BUILDPLATFORM} node:22-alpine AS runner
 WORKDIR /app
 
 # Set NODE_ENV to production
