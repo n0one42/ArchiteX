@@ -16,7 +16,7 @@ const compat = new FlatCompat({
 
 // Next.js / TypeScript + Prettier base config via FlatCompat
 const baseConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript", "prettier"),
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     rules: {
       // typescript
